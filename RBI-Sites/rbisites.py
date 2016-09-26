@@ -267,6 +267,7 @@ def lookup_search():
                             date_of_inspection=form.date_of_inspection.data
                             )
         sites = DB.find_sites(query)
+        print "Type for sites : " + str(type(sites))
         return render_template("lookup.html", searchform=form, sites=sites)
     return redirect(url_for('lookup'))
 
@@ -276,7 +277,19 @@ def lookup_search():
 def lookup_showsite():
     siteid = request.args.get("siteid")
     site = list(DB.show_site(siteid))
-    return render_template("showsite.html", site=site)
+    return render_template("showsite.html", sites=site)
+
+
+@app.route("/lookup/update")
+@login_required
+def lookup_updatesite():
+    siteid = request.args.get("siteid")
+    form = SearchForm(request.form)
+    if form.validate():
+        site = list(DB.show_site(siteid))
+        return render_template("showsite.html", searchform=form, sites=sites)
+    return redirect(url_for('lookup'))
+
 
 @app.route("/output")
 @login_required
@@ -301,7 +314,7 @@ def output_search():
 
         main_filename = save_to_workbook(sites, output_columns_main, "sites.xlsx")
 
-        loading_filename = save_to_workbook(sites, output_columns_loadings, "loadings.xlsx")
+        # loading_filename = save_to_workbook(sites, output_columns_loadings, "loadings.xlsx")
 
         return render_template('download.html')
     else:

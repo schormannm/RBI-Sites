@@ -40,5 +40,20 @@ class SearchForm(Form):
     submit = SubmitField('searchsubmit', validators=[validators.DataRequired()])
 
 
+class UpdateForm(Form):
+    site_name = StringField('Site Classification')
+    site_release_date = StringField(u'site_release_date')
+    as_built_choices = [('','Not known'),('Yes','Yes'),('No','No')]
+    as_built_available = StringField('as_built_available')
+    fault_description = StringField('Fault Description')
+    mast_engineer = StringField('Mast Engineer')
+    mast_upgraded_choices = [('','Not known'),('Yes','Yes'),('No','No')]
+    mast_upgraded = StringField('Mast Upgraded')
+    mast_upgraded_date = StringField('Date Mast Upgraded')
+    capacity_top = StringField('Capacity at top')
+    capacity_10_from_top = StringField('Capacity 10m from top')
+
+    submit = SubmitField('updatesubmit', validators=[validators.DataRequired()])
+
 #
 

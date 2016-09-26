@@ -13,7 +13,8 @@
         <div class="col-md-12">
           <h2>Site detail for site chosen</h2>
             <table class="table table-striped">
-              <tr>
+               {% for site in sites %}
+             <tr>
                 <th>Site Name</th>
                 <th>Site Number</th>
                 <th>Region</th>
@@ -22,14 +23,34 @@
               </tr>
                   <tr>
                     <td>{{site.site.site_group.site_name}}</td>
-{#                    <td>{{site.site.site_group.site_number}}</td>#}
-{#                    <td>{{site.site.site_group.region}}</td>#}
-{#                    <td>{{site.site.tower_type}}</td>#}
-{#                    <td>{{site.site.date_of_inspection}}</td>#}
+                    <td>{{site.site.site_group.site_number}}</td>
+                    <td>{{site.site.site_group.region}}</td>
+                    <td>{{site.site.tower_type}}</td>
+                    <td>{{site.site.date_of_inspection}}</td>
                   </tr>
 
             </table>
-            <p>What appears below is the raw data for the site.</p>
+
+                <form class="form-inline" action="/lookup/update">
+                  <tr>
+                    <td>{{site.site.manual.site_classification}}</td>
+                    <td>{{site.site.manual.site_release_date}}</td>
+                    <td>{{site.site.manual.as_built_available}}</td>
+                    <td>{{site.site.manual.fault_description}}</td>
+                    <td>{{site.site.manual.mast_engineer}}</td>
+                    <td>{{site.site.manual.mast_upgraded}}</td>
+                    <td>{{site.site.manual.mast_upgrade_date}}</td>
+                    <td>{{site.site.manual.capacity_top}}</td>
+                    <td>{{site.site.manual.capacity_10_from_top}}</td>
+                    <td> <input type="submit" value="Update" class="form-control"></td>
+                    <input type="text" name="siteid" value="{{site._id}}" hidden>
+                  </tr>
+                </form>
+
+            {% endfor %}
+
+
+
 
         </div>
       </div>
