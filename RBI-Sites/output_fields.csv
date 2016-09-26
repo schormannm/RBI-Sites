@@ -1,0 +1,15 @@
+index,tag,header,querystr
+1,"instanceID","instanceID","site.@instanceID"
+2,"site_name","site_name","site.site_group.site_name"
+3,"site_number","site_number","site.site_group.site_number"
+4,"inspector_name","inspector_name","site.inspector_name"
+5,"region","region","site.site_group.region"
+6,"gps_location","gps_location","site.site_group.gps_location"
+7,"date_of_inspection","date_of_inspection","site.date_of_inspection"
+8,"date_of_next_inspection_recommended","date_of_next_inspection_recommended","date_of_next_inspection_recommended"
+9,"tower_owner","tower_owner","site.site_group.tower_owner"
+10,"tower_type","tower_type","site.tower_type"
+11,"manufacturer","manufacturer","site.site_group.manufacturer"
+12,"job_number","job_number","site.site_group.job_number"
+13,"tower_total_height","tower_total_height","site.tower_top.tower_total_height"
+

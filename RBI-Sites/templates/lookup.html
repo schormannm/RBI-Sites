@@ -1,0 +1,62 @@
+{% extends "base.html" %}
+
+{% block content %}
+    <div class="jumbotron">
+      <div class="container">
+        <h1>Site Lookup</h1>
+        <p>Find sites from the database</p>
+      </div>
+    </div>
+
+    <div class="container">
+      <div class="row">
+        <div class="col-md-12">
+          <h2>Find Site by parameters</h2>
+          <form class="form-inline" action="/lookup/search" method="POST">
+            <div class="form-group">
+              {% if searchform.site_name.errors %}
+                <ul class="errors">
+                  {% for error in searchform.site_name.errors %}
+                    <li>{{error}}</li>
+                  {% endfor %}
+                </ul>
+              {% endif %}
+              {{ searchform.csrf_token}}
+              {{ searchform.site_name(class="form-control", placeholder="Site name")}}
+              {{ searchform.site_number(class="form-control", placeholder="Site number")}}
+              {{ searchform.region(class="form-control", placeholder="Region")}}
+              {{ searchform.tower_type(class="form-control", placeholder="Tower type")}}
+              {{ searchform.date_of_inspection(class="form-control", placeholder="Inspection date")}}
+              {{ searchform.submit(value="Find", class="btn btn-primary") }}
+            </div>
+          </form>
+
+          <h2>Sites</h2>
+            <table class="table table-striped">
+              <tr>
+                <th>Site Name</th>
+                <th>Site Number</th>
+                <th>Region</th>
+                <th>Type</th>
+                  <th>Date</th>
+                <th>Show</th>
+              </tr>
+              {% for site in sites %}
+                <form class="form-inline" action="/lookup/showsite">
+                  <tr>
+                    <td>{{site.site.site_group.site_name}}</td>
+                    <td>{{site.site.site_group.site_number}}</td>
+                    <td>{{site.site.site_group.region}}</td>
+                    <td>{{site.site.tower_type}}</td>
+                    <td>{{site.site.date_of_inspection}}</td>
+                    <td> <input type="submit" value="Show" class="form-control"></td>
+                    <input type="text" name="siteid" value="{{site._id}}" hidden>
+                  </tr>
+                </form>
+              {% endfor %}
+            </table>
+
+        </div>
+      </div>
+    </div>
+{% endblock %}

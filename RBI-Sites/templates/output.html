@@ -1,0 +1,48 @@
+{% extends "base.html" %}
+
+{% block content %}
+    <div class="jumbotron">
+      <div class="container">
+        <h1>Output sites</h1>
+        <p>Produce output file of sites from the database</p>
+      </div>
+    </div>
+
+    <div class="container">
+      <div class="row">
+        <div class="col-md-12">
+          <h2>Find Site by parameters</h2>
+          <form class="form-inline" action="/output/search" method="POST">
+            <div class="form-group">
+              {% if searchform.site_name.errors %}
+                <ul class="errors">
+                  {% for error in searchform.site_name.errors %}
+                    <li>{{error}}</li>
+                  {% endfor %}
+                </ul>
+              {% endif %}
+            <p>
+              {{ searchform.csrf_token}}
+              {{ searchform.site_name(class="form-control", placeholder="Site name")}}
+              {{ searchform.site_number(class="form-control", placeholder="Site number")}}
+              {{ searchform.region(class="form-control", placeholder="Region")}}
+              {{searchform.tower_type(class="form-control", placeholder="Tower type")}}
+            </p>
+                <p>
+             Only include inspections for this specific date : {{searchform.date_of_inspection(class="form-control", placeholder="Inspection date")}}
+                </p>
+                <p>OR select one or both of the selectors below. *** FUTURE FEATURE ALERT - Selectors below are not working yet ***</p>
+                <p>
+             Only include inspections before this date : {{searchform.date_of_inspection_before(class="form-control", placeholder="Inspection before date")}}
+                </p><p>
+             Only include inspections after this date  : {{searchform.date_of_inspection_after(class="form-control", placeholder="Inspection after date")}}
+            </p><p>
+              {{ searchform.submit(value="Generate output", class="btn btn-primary") }}
+            </p>
+            </div>
+          </form>
+
+       </div>
+      </div>
+    </div>
+{% endblock %}

@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+</head>
+<body>
+
+          <h2>Download</h2>
+            <table class="table table-striped">
+                <td>
+              <tr>
+                  <a href="{{ url_for('download', filename='sites.xlsx') }}">Download the file</a>
+              </tr>
+            <tr>
+              <form action="/output/download" method="post" enctype="multipart/form-data">
+                    <div class="form-group">
+                        <input type="submit" value="Download output"/>
+                    </div>
+              </form>
+             </tr>
+            </td>
+            </table>
+
+
+</body>
+</html>

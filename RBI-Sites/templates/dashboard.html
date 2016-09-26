@@ -1,0 +1,31 @@
+{% extends "base.html" %}
+{% block metarefresh %} <meta http-equiv="refresh" content="10" > {% endblock %}
+{% block content %}
+    <div class="jumbotron">
+      <div class="container">
+        <h1>Dashboard</h1>
+        <p>View all sites below</p>
+      </div>
+    </div>
+
+    <div class="container">
+      <div class="row">
+        <div class="col-md-12">
+          <h2>Summary</h2>
+            <p>A brief summary of the overall status of the database as at {{ date_now }} :</p>
+            <p></p>
+            <table class="table table-striped">
+              <tr>
+                <th>Type of tower</th>
+                <th>Number of sites</th>
+              </tr>
+            {% for feature in features %}
+                <tr>
+                <td>{{feature.description}}</td><td>{{feature.value}}</td>
+                </tr>
+            {% endfor %}
+            </table>
+        </div>
+      </div>
+    </div>
+{% endblock %}

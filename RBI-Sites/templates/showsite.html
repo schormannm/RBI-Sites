@@ -1,0 +1,37 @@
+{% extends "base.html" %}
+{% block metarefresh %} <meta http-equiv="refresh" content="10" > {% endblock %}
+{% block content %}
+    <div class="jumbotron">
+      <div class="container">
+        <h1>Show site</h1>
+        <p>View a single site</p>
+      </div>
+    </div>
+
+    <div class="container">
+      <div class="row">
+        <div class="col-md-12">
+          <h2>Site detail for site chosen</h2>
+            <table class="table table-striped">
+              <tr>
+                <th>Site Name</th>
+                <th>Site Number</th>
+                <th>Region</th>
+                <th>Type</th>
+                  <th>Date</th>
+              </tr>
+                  <tr>
+                    <td>{{site.site.site_group.site_name}}</td>
+{#                    <td>{{site.site.site_group.site_number}}</td>#}
+{#                    <td>{{site.site.site_group.region}}</td>#}
+{#                    <td>{{site.site.tower_type}}</td>#}
+{#                    <td>{{site.site.date_of_inspection}}</td>#}
+                  </tr>
+
+            </table>
+            <p>What appears below is the raw data for the site.</p>
+
+        </div>
+      </div>
+    </div>
+{% endblock %}
