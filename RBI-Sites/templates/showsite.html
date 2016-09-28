@@ -57,48 +57,44 @@
             <tr>
               <td>Site Classification</td>
                 <td>{{ updateform.site_classification( class="form-control", placeholder="Site classification")}}</td>
-                </tr>
-              <tr>
               <td>Site Release Date </td>
-                  <td>{{ updateform.site_release_date(class="form-control", placeholder="Site release date")}}</td>
-              </tr>
-                <tr>
-                    <td>As built available?</td>
-                <td>{{ updateform.as_built_available(class="form-control", placeholder="As built available")}}</td></tr>
+                  <td>{{ updateform.site_release_date(class="form-control", placeholder="Release date YYYY-MM-DD")}}</td>
+                </tr>
               <tr>
                   <td>Fault description </td>
                   <td>{{ updateform.fault_description(class="form-control", placeholder="Fault description")}}</td></tr>
-              <tr>
+              </tr>
+                <tr>
                   <td>Mast Engineer</td>
                   <td>{{ updateform.mast_engineer(class="form-control", placeholder="Mast engineer")}}</td>
-              </tr>
+                    <td>As built available?</td>
+                <td>{{ updateform.as_built_available(class="form-control", placeholder="As built available")}}</td></tr>
+              <tr>
               <tr>
                   <td>Mast upgraded?</td>
                   <td>{{ updateform.mast_upgraded(class="form-control", placeholder="Mast upgraded")}}</td>
-              </tr>
-              <tr>
                   <td>Mast upgraded date</td>
-                  <td>{{ updateform.mast_upgraded_date(class="form-control", placeholder="Mast upgrade date")}}</td>
+                  <td>{{ updateform.mast_upgraded_date(class="form-control", placeholder="Date upgraded YYYY-MM-DD")}}</td>
               </tr>
               <tr>
                   <td>Capacity top</td>
                   <td>{{ updateform.capacity_top(class="form-control", placeholder="Capacity at top")}}</td>
-              </tr>
-              <tr>
                   <td>Capacity 10m from top</td>
                   <td>{{ updateform.capacity_10_from_top(class="form-control", placeholder="Capacity 10 from top")}}</td>
+              </tr>
+              <tr>
               </tr>
                 <tr>
                     <td><input type="text" name="siteid" value="{{site._id}}" hidden></td>
                     <td>{{ updateform.submit(value="Submit", class="btn btn-primary") }}</td>
                 </tr>
 
+            </table>
 
 
             </div>
           </form>
 
-            </table>
 
 
         </div>

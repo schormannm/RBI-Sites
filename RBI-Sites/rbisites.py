@@ -150,15 +150,15 @@ output_lookup = {"instanceID": "site.@instanceID",
                  "latitude": "site.site_group.gps_location.gps_latitude",
                  "longitude": "site.site_group.gps_location.gps_longitude",
                  "mast_category": "site.grading",
-                 "site_classification": "",
-                 "site_release_date": "",
-                 "as_built_available": "",
-                 "fault_description": "",
-                 "mast_engineer": "",
-                 "mast_upgraded": "",
-                 "mast_upgrade_date": "",
-                 "capacity_top": "",
-                 "capacity_10_from_top": "",
+                 "site_classification": "site.manual.site_classification",
+                 "site_release_date": "site.manual.site_release_date",
+                 "as_built_available": "site.manual.as_built_available",
+                 "fault_description": "site.manual.fault_description",
+                 "mast_engineer": "site.manual.mast_engineer",
+                 "mast_upgraded": "site.manual.mast_upgraded",
+                 "mast_upgrade_date": "site.manual.mast_upgrade_date",
+                 "capacity_top": "site.manual.capacity_top",
+                 "capacity_10_from_top": "site.manual.capacity_10_from_top",
                  "loading_operator": "site.@instanceID",
                  "nr_of_GSM_antenna": "site.@instanceID",
                  "size_of_GSM_antenna": "site.@instanceID",
@@ -286,7 +286,7 @@ def lookup_showsite():
         print "Inside /lookup/showsite - and DB.manual_exists is False"
         context = {
             'site.manual.updated': 'False',
-            'site.manual.site_classification': "Fat Charlie",
+            'site.manual.site_classification': "",
             'site.manual.site_release_date': "",
             'site.manual.as_built_available': "",
             'site.manual.fault_description': "",
@@ -318,21 +318,22 @@ def lookup_updatesite():
     nownow = datetime.datetime.now().strftime('%Y-%m-%d')
     if form.validate():
         context = {
-            'updated': 'True',
-            'site_classification': form.site_classification.data,
-            'site_release_date': form.site_release_date.data,
-            'as_built_available': form.as_built_available.data,
-            'fault_description': form.fault_description.data,
-            'mast_engineer': form.mast_engineer.data,
-            'mast_upgraded': form.mast_upgraded.data,
-            'mast_upgraded_date': form.mast_upgraded_date.data,
-            'capacity_top': form.capacity_top.data,
-            'capacity_10_from_top': form.capacity_10_from_top.data,
-            'date_now': nownow
+            'site.manual.updated': 'True',
+            'site.manual.site_classification': form.site_classification.data,
+            'site.manual.site_release_date': form.site_release_date.data,
+            'site.manual.as_built_available': form.as_built_available.data,
+            'site.manual.fault_description': form.fault_description.data,
+            'site.manual.mast_engineer': form.mast_engineer.data,
+            'site.manual.mast_upgraded': form.mast_upgraded.data,
+            'site.manual.mast_upgraded_date': form.mast_upgraded_date.data,
+            'site.manual.capacity_top': form.capacity_top.data,
+            'site.manual.capacity_10_from_top': form.capacity_10_from_top.data,
+            'site.manual.update_date': nownow
         }
         print "Show context"
         print context
         DB.update_site_manual(siteid, context)
+        # DB.update_site_manual_p(siteid, **context)
         print "Update site with context"
         sites = list(DB.show_site(siteid))
         print "Length for sites : " + str(len(sites))

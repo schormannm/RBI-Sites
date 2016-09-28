@@ -47,8 +47,9 @@ class DBHelper:
         print manual
         self.db.sites.update({"_id": ObjectId(_id)}, {"$set": manual})
 
+
     def check_manual_exists(self, _id):
-        result = len(list(self.db.sites.find({"_id": ObjectId(_id), "site.manual.Updated": "True"})))
+        result = len(list(self.db.sites.find({"_id": ObjectId(_id), "site.manual.updated": "True"})))
         print result
         if result:
             return True
