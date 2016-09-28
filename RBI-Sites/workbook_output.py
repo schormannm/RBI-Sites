@@ -116,32 +116,33 @@ output_lookup = {"instanceID": "site.@instanceID",
                  "height_of_MW_dish": "site.@instanceID",
                  "date_of_structural_approval": "site.@instanceID",
                  "structural_approval_for": "site.@instanceID"
-
                  }
 
 
-# Create a workbook and add a worksheet.
-# workbook = load_workbook('sites.xlsx')
+# Create a workbook and add worksheets
 def save_to_workbook(sites, output_file):
     workbook = Workbook()
 
-    # worksheet = workbook.active
-    worksheet = workbook.create_sheet(title="Data", index=0)
+    create_sites_worksheet(sites, workbook, "Sites", 0, output_columns_main)
+    create_loadings_worksheet(sites, workbook, "Loadings", 1, output_columns_loadings)
 
-    output_columns = output_columns_main
+    # Save the file
+    output_filename = output_file
+    workbook.save(output_filename)
+    print "Output file : " + output_filename + " saved"
+    return output_filename
 
-    print output_columns
 
+def create_heading_row(worksheet, output_columns):
     # Start from the first cell. Rows and columns are zero indexed.
     row = 1
     for tag, value in output_columns.iteritems():
         _ = worksheet.cell(row=row, column=value, value=tag)
 
+
+def create_data_rows(sites, worksheet, output_columns):
     row = 2
     for site in sites:
-
-        print "Site data : " + str(site)
-
         # Iterate over the data and write it out row by row.
         for tag, value in output_columns.iteritems():
             col = output_columns[tag]  # get the column from the dictionary
@@ -153,11 +154,19 @@ def save_to_workbook(sites, output_file):
         row += 1
         col = 1
 
-    # Save the file
-    output_filename = output_file
-    workbook.save(output_filename)
-    print "Output file : " + output_filename + " saved"
-    return output_filename
+
+def create_sites_worksheet(sites, workbook, sheet_title, sheet_nr, column_def):
+    worksheet = workbook.create_sheet(title=sheet_title, index=sheet_nr)
+
+    create_heading_row(worksheet, column_def)
+    create_data_rows(sites, worksheet, column_def)
+
+
+def create_loadings_worksheet(sites, workbook, sheet_title, sheet_nr, column_def):
+    worksheet = workbook.create_sheet(title=sheet_title, index=sheet_nr)
+
+    create_heading_row(worksheet, column_def)
+    create_data_rows(sites, worksheet, column_def)
 
 
 def get_site_value(site, tag):
