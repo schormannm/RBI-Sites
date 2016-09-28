@@ -1,5 +1,6 @@
 {% extends "base.html" %}
 
+
 {% block content %}
     <div class="jumbotron">
       <div class="container">
@@ -49,7 +50,7 @@
                     <td>{{site.site.site_group.region}}</td>
                     <td>{{site.site.tower_type}}</td>
                     <td>{{site.site.date_of_inspection}}</td>
-                    <td> <input type="submit" value="Show" class="form-control"></td>
+                    <td> <input type="submit" value="Update" class="form-control"></td>
                     <input type="text" name="siteid" value="{{site._id}}" hidden>
                   </tr>
                 </form>

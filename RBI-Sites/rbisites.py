@@ -34,6 +34,7 @@ from bitlyhelper import BitlyHelper
 from forms import RegistrationForm
 from forms import LoginForm
 from forms import SearchForm
+from forms import UpdateForm
 
 from myutils import sanitize_string
 from myutils import format_date
@@ -259,6 +260,7 @@ def lookup():
 @login_required
 def lookup_search():
     form = SearchForm(request.form)
+    print form.data
     if form.validate():
         query = make_query(site_name=form.site_name.data,
                             site_number=form.site_number.data,
@@ -267,28 +269,79 @@ def lookup_search():
                             date_of_inspection=form.date_of_inspection.data
                             )
         sites = DB.find_sites(query)
-        print "Type for sites : " + str(type(sites))
+        print "Length for sites : " + str(len(sites))
+        site = sites[0]
+        print site
         return render_template("lookup.html", searchform=form, sites=sites)
     return redirect(url_for('lookup'))
 
 
-@app.route("/lookup/showsite")
+@app.route("/lookup/showsite", methods=["POST", "GET"])
 @login_required
 def lookup_showsite():
     siteid = request.args.get("siteid")
-    site = list(DB.show_site(siteid))
-    return render_template("showsite.html", sites=site)
+    if DB.check_manual_exists(siteid):
+        print "Inside /lookup/showsite - and DB.manual_exists is True"
+    else:
+        print "Inside /lookup/showsite - and DB.manual_exists is False"
+        context = {
+            'site.manual.updated': 'False',
+            'site.manual.site_classification': "Fat Charlie",
+            'site.manual.site_release_date': "",
+            'site.manual.as_built_available': "",
+            'site.manual.fault_description': "",
+            'site.manual.mast_engineer': "",
+            'site.manual.mast_upgraded': "",
+            'site.manual.mast_upgraded_date': "",
+            'site.manual.capacity_top': "",
+            'site.manual.capacity_10_from_top': "",
+            'site.manual.update_date': ""
+        }
+        DB.update_site_manual(siteid, context)
+    sites = list(DB.show_site(siteid))
+    print "Length for sites : " + str(len(sites))
+    site = sites[0]
+    print site
+    return render_template("showsite.html", updateform=UpdateForm(), site=site)
 
 
-@app.route("/lookup/update")
+@app.route("/lookup/update", methods=["POST", "GET"])
 @login_required
 def lookup_updatesite():
-    siteid = request.args.get("siteid")
-    form = SearchForm(request.form)
+    # siteid = request.args.get("siteid")
+    form = UpdateForm(request.form)
+    siteid = form.siteid.data
+    print form.data
+    print "Inside lookup/update - about to validate form"
+    print siteid
+    print form.site_classification.data
+    nownow = datetime.datetime.now().strftime('%Y-%m-%d')
     if form.validate():
-        site = list(DB.show_site(siteid))
-        return render_template("showsite.html", searchform=form, sites=sites)
+        context = {
+            'updated': 'True',
+            'site_classification': form.site_classification.data,
+            'site_release_date': form.site_release_date.data,
+            'as_built_available': form.as_built_available.data,
+            'fault_description': form.fault_description.data,
+            'mast_engineer': form.mast_engineer.data,
+            'mast_upgraded': form.mast_upgraded.data,
+            'mast_upgraded_date': form.mast_upgraded_date.data,
+            'capacity_top': form.capacity_top.data,
+            'capacity_10_from_top': form.capacity_10_from_top.data,
+            'date_now': nownow
+        }
+        print "Show context"
+        print context
+        DB.update_site_manual(siteid, context)
+        print "Update site with context"
+        sites = list(DB.show_site(siteid))
+        print "Length for sites : " + str(len(sites))
+        site = sites[0]
+        print "Show site after fetch"
+        print site
+        # return render_template("showsite.html", updateform=form, site=site)
     return redirect(url_for('lookup'))
+
 
 
 @app.route("/output")

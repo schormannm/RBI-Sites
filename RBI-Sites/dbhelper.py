@@ -28,6 +28,33 @@ class DBHelper:
     def update_site(self, _id, url):
         self.db.sites.update({"_id": _id}, {"$set": {"url": url}})
 
+    def update_site_manual(self, _id, manual):
+        # manual = {"site.manual.updated": "Yes", "site.manual.site_classification": "K"}
+        # manual = {
+        #     'site.manual.updated': 'True',
+        #     'site.manual.site_classification': "J",
+        #     'site.manual.site_release_date': "",
+        #     'site.manual.as_built_available': "",
+        #     'site.manual.fault_description': "",
+        #     'site.manual.mast_engineer': "Mark",
+        #     'site.manual.mast_upgraded': "",
+        #     'site.manual.mast_upgraded_date': "",
+        #     'site.manual.capacity_top': "",
+        #     'site.manual.capacity_10_from_top': "",
+        #     'site.manual.update_date': ""
+        # }
+
+        print manual
+        self.db.sites.update({"_id": ObjectId(_id)}, {"$set": manual})
+
+    def check_manual_exists(self, _id):
+        result = len(list(self.db.sites.find({"_id": ObjectId(_id), "site.manual.Updated": "True"})))
+        print result
+        if result:
+            return True
+        else:
+            return False
+
     def get_sites(self, site_name = None):
         query = {}
         if site_name:
@@ -38,8 +65,8 @@ class DBHelper:
     def get_site(self, site_id):
         return self.db.sites.find_one({"_id": site_id})
 
-    def show_site(self, site_id):
-        query = {"_id": ObjectId(site_id)}
+    def show_site(self, _id):
+        query = {"_id": ObjectId(_id)}
         return self.db.sites.find(query)
 
     def find_sites(self, query):
@@ -49,36 +76,8 @@ class DBHelper:
     def get_site_count(self,query):
         return self.db.sites.find(query).count()
 
-# The following methods are all to query the output setup collection
-    def get_output_count(self):
-        return self.db.output.count()
-
-    def get_output_header(self, index):
-        query = {"output.header": index}
-        return self.db.output.findone(query)
-
-    def get_output_querystr(self, index):
-        query = {"output.querystr": index}
-        return self.db.output.findone(query)
-
-    def get_output_header_tag(self, index):
-        query = {"output.index": index}
-        cursor = self.db.output.find_one(query)
-        for document in cursor:
-            print document
-        return document
-
-    def get_output_header_index(self, tag):
-        query = {"output.index": tag}
-        return self.db.output.findone(query)
-
-    def get_output_header_bytag(self, tag):
-        query = {"output.header": tag}
-        return self.db.output.findone(query)
-
-    def get_output_querystr_bytag(self, tag):
-        query = {"output.querystr": tag}
-        return self.db.output.findone(query)
+    def delete_site(self, site_id):
+        self.db.sites.remove({"_id": ObjectId(site_id)})
 
 
 # old methods from the waiter project
@@ -110,5 +109,3 @@ class DBHelper:
     def get_requests(self, owner_id):
         return list(self.db.requests.find({"owner": owner_id}))
 
-    def delete_request(self, request_id):
-        self.db.requests.remove({"_id": ObjectId(request_id)})
