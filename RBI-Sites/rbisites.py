@@ -163,8 +163,22 @@ def lookup_search():
 @login_required
 def lookup_showsite():
     siteid = request.args.get("siteid")
+    form = UpdateForm()
+
     if DB.check_manual_exists(siteid):
         print "Inside /lookup/showsite - and DB.manual_exists is True"
+        sites = list(DB.show_site(siteid))
+        mysite = sites[0]
+        manual = mysite['site']['manual']
+        form.site_classification.data = manual['site_classification']
+        form.site_release_date.data = manual['site_release_date']
+        form.as_built_available.data = manual['as_built_available']
+        form.fault_description.data = manual['fault_description']
+        form.mast_engineer.data = manual['mast_engineer']
+        form.mast_upgraded.data = manual['mast_upgraded']
+        form.mast_upgraded_date.data = manual['mast_upgraded_date']
+        form.capacity_top.data = manual['capacity_top']
+        form.capacity_10_from_top.data = manual['capacity_10_from_top']
     else:
         print "Inside /lookup/showsite - and DB.manual_exists is False"
         context = {
@@ -185,7 +199,7 @@ def lookup_showsite():
     print "Length for sites : " + str(len(sites))
     site = sites[0]
     print site
-    return render_template("showsite.html", updateform=UpdateForm(), site=site)
+    return render_template("showsite.html", updateform=form, site=site)
 
 
 @app.route("/lookup/update", methods=["POST", "GET"])

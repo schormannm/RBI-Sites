@@ -69,10 +69,8 @@ output_columns_loadings = {"instanceID": 1,
                            "size_of_GSM_antenna": 8,
                            "height_of_GSM_antenna": 9,
                            "number_of_MW_dishes": 10,
-                           "size_of_MW_dish": 11,
-                           "height_of_MW_dish": 12,
-                           "date_of_structural_approval": 13,
-                           "structural_approval_for": 14
+                           "date_of_structural_approval": 11,
+                           "structural_approval_for": 12
 
                            }
 
@@ -107,15 +105,13 @@ output_lookup = {"instanceID": "site.@instanceID",
                  "mast_upgrade_date": "site.manual.mast_upgrade_date",
                  "capacity_top": "site.manual.capacity_top",
                  "capacity_10_from_top": "site.manual.capacity_10_from_top",
-                 "loading_operator": "site.@instanceID",
-                 "nr_of_GSM_antenna": "site.@instanceID",
-                 "size_of_GSM_antenna": "site.@instanceID",
-                 "height_of_GSM_antenna": "site.@instanceID",
-                 "number_of_MW_dishes": "site.@instanceID",
-                 "size_of_MW_dish": "site.@instanceID",
-                 "height_of_MW_dish": "site.@instanceID",
-                 "date_of_structural_approval": "site.@instanceID",
-                 "structural_approval_for": "site.@instanceID"
+                 "loading_operator": "site.loadings_group.sorted_loading_table.sorted_loading_table-repeat.@.owner",
+                 "nr_of_GSM_antenna": "site.loadings_group.summary_loading_table.&.panel",
+                 "size_of_GSM_antenna": "site.loadings_group.sorted_loading_table.sorted_loading_table-repeat.@.size",
+                 "height_of_GSM_antenna": "site.loadings_group.sorted_loading_table.sorted_loading_table-repeat.@.height",
+                 "number_of_MW_dishes": "site.loadings_group.summary_loading_table.&.panel",
+                 "date_of_structural_approval": "site.loading_group.summary_loading_table.&.date_of_structural_approval",
+                 "structural_approval_for": "site.loading_group.summary_loading_table.&.structural_approval_for"
                  }
 
 
@@ -146,6 +142,7 @@ def create_data_rows(sites, worksheet, output_columns):
         # Iterate over the data and write it out row by row.
         for tag, value in output_columns.iteritems():
             col = output_columns[tag]  # get the column from the dictionary
+            tag = tag_fixer(tag, row)
             value = get_site_value(site, tag)
             # print "Tag : " + tag + " Value: " + str(value)
             _ = worksheet.cell(row=row, column=col, value=value)
@@ -154,6 +151,35 @@ def create_data_rows(sites, worksheet, output_columns):
         row += 1
         col = 1
 
+
+def create_data_rows_loadings(sites, worksheet, output_columns):
+    row = 2
+    for site in sites:
+        # Iterate over the data and write it out row by row.
+        mongo_str = "site.loadings_group.sorted_loading_table.sorted_loading_table-repeat"
+        args = mongo_str.split(".")
+        loading_table = dict_digger.dig(site, *args)
+        print "Loading table"
+        print loading_table
+        return
+        for loading in loading_table:
+
+            for tag, value in output_columns.iteritems():
+                col = output_columns[tag]  # get the column from the dictionary
+                tag = tag_fixer(tag, row)
+                value = get_site_value(site, tag)
+                # print "Tag : " + tag + " Value: " + str(value)
+                _ = worksheet.cell(row=row, column=col, value=value)
+                col += 1
+
+            row += 1
+            col = 1
+
+
+def tag_fixer(tag, row):
+    index = row
+    new_tag = tag
+    return new_tag
 
 def create_sites_worksheet(sites, workbook, sheet_title, sheet_nr, column_def):
     worksheet = workbook.create_sheet(title=sheet_title, index=sheet_nr)
