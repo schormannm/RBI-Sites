@@ -227,19 +227,19 @@ def lookup_updatesite():
             'site.manual.capacity_10_from_top': form.capacity_10_from_top.data,
             'site.manual.update_date': nownow
         }
-        print "Show context"
-        print context
         DB.update_site_manual(siteid, context)
-        # DB.update_site_manual_p(siteid, **context)
-        print "Update site with context"
         sites = list(DB.show_site(siteid))
-        print "Length for sites : " + str(len(sites))
         site = sites[0]
         print "Show site after fetch"
         print site
         # return render_template("showsite.html", updateform=form, site=site)
     return redirect(url_for('lookup'))
 
+
+@app.route("/compare")
+@login_required
+def compare():
+    return render_template("compare.html", searchform=SearchForm())
 
 
 @app.route("/output")
