@@ -1,0 +1,39 @@
+{% extends "base.html" %}
+
+{% block bodytag %}
+
+
+    <body>
+    <script>
+        $(function () {
+            $(".dtpick").datepicker({dateFormat: 'yy-mm-dd'});
+        });
+    </script>
+{% endblock %}
+
+{% block content %}
+    <div class="jumbotron">
+        <div class="container">
+            <h1>Vort Date Picker Example</h1>
+            <p>Test the date picker in Bootstrap context</p>
+        </div>
+    </div>
+
+    <div class="container">
+        <div class="row">
+            <div class="col-md-12">
+
+
+                <form method="post" action="">
+                    {{ form.hidden_tag() }}
+                    {{ form.dt(class="dtpick") }}
+                    <button type="submit">Go</button>
+                </form>
+
+            </div>
+        </div>
+    </div>
+
+
+{% endblock %}
+
