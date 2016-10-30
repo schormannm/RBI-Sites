@@ -10,12 +10,25 @@ class DBHelper:
         client = pymongo.MongoClient()
         self.db = client[DATABASE]
 
+    def number_of_records(self):
+        return self.db.sites.count()
+
     def add_site(self, site):
-        try:
-            self.db.sites.insert({"site": site})
+        site_id = site["@instanceID"]  # site data comes in as a dictionary, so we can search for records based on it
+        print site_id
+        result = self.db.sites.find_one({"site.@instanceID": site_id})
+        if result is not None:
+            print "Found a match  in db"
             return True
-        except pymongo.errors.DuplicateKeyError:
-            return False
+        else:
+            try:
+                self.db.sites.insert_one({"site": site})
+                # print "Matched: " + str(result.matched_count) + "   Modified: " + str(result.modified_count)
+                print "Site with ID: " + site_id + " added to database"
+                return True
+            except pymongo.errors.DuplicateKeyError:
+                print "Duplicate key error exception triggered"
+                return False
 
     def get_user(self, email):
         return self.db.users.find_one({"email": email})
