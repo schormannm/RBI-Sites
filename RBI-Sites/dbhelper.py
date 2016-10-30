@@ -15,6 +15,7 @@ class DBHelper:
         return self.db.users.find_one({"email": email})
 
     def add_user(self, email, salt, hashed):
+        print "In DBHelpter - About to add user to database"
         self.db.users.insert({"email": email, "salt": salt, "hashed": hashed})
 
 # site manipulation methods

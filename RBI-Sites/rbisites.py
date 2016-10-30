@@ -1,5 +1,6 @@
 import datetime
 import os
+import sys
 import string
 import json
 import time
@@ -7,7 +8,6 @@ import re
 import urllib2
 import dateparser
 from collections import OrderedDict
-
 
 from flask import Flask
 from flask import render_template
@@ -32,6 +32,7 @@ from forms import RegistrationForm
 from forms import LoginForm
 from forms import SearchForm
 from forms import UpdateForm
+from forms import DateForm
 
 from myutils import sanitize_string
 from myutils import format_date
@@ -63,7 +64,7 @@ def home():
 @app.route("/new-user")
 def register_new_user():
     now = datetime.datetime.now()
-    return render_template("register_new_user.html",  registrationform=RegistrationForm())
+    return render_template("register_new_user.html", registrationform=RegistrationForm())
 
 
 @login_manager.user_loader
@@ -89,15 +90,19 @@ def login():
 @app.route("/register", methods=["POST"])
 def register():
     form = RegistrationForm(request.form)
+    print "About to validate form"
     if form.validate():
+        print "Validated"
         if DB.get_user(form.email.data):
             form.email.errors.append("Email address already registered")
             return render_template("home.html", loginform=LoginForm(), registrationform=form)
+        print "User is not already in database - so good to add"
         salt = PH.get_salt()
         hashed = PH.get_hash(form.password2.data + salt)
         DB.add_user(form.email.data, salt, hashed)
-        return render_template("home.html", loginform=LoginForm(), registrationform=form, onloadmessage="Registration successful. Please log in.")
-    return render_template("home.html", loginform=LoginForm(), registrationform=form)
+        return render_template("home.html", loginform=LoginForm(), registrationform=form,
+                               onloadmessage="Registration successful. Please log in.")
+    return render_template("register_new_user.html", loginform=LoginForm(), registrationform=form)
 
 
 @app.route("/logout")
@@ -110,9 +115,9 @@ def logout():
 @login_required
 def dashboard():
     nownow = datetime.datetime.now().strftime('%Y-%m-%d')
-    lattice_cnt = DB.get_site_count({"site.tower_type":"Lattice"})
-    monopole_cnt = DB.get_site_count({"site.tower_type":"Monopole"})
-    monolattice_cnt = DB.get_site_count({"site.tower_type":"Mono-Lattice"})
+    lattice_cnt = DB.get_site_count({"site.tower_type": "Lattice"})
+    monopole_cnt = DB.get_site_count({"site.tower_type": "Monopole"})
+    monolattice_cnt = DB.get_site_count({"site.tower_type": "Mono-Lattice"})
     total_cnt = DB.get_site_count({})
     context = {
         'features': [
@@ -146,11 +151,11 @@ def lookup_search():
     print form.data
     if form.validate():
         query = make_query(site_name=form.site_name.data,
-                            site_number=form.site_number.data,
-                            region=form.region.data,
-                            type=form.tower_type.data,
-                            date_of_inspection=form.date_of_inspection.data
-                            )
+                           site_number=form.site_number.data,
+                           region=form.region.data,
+                           type=form.tower_type.data,
+                           date_of_inspection=form.date_of_inspection.data
+                           )
         sites = DB.find_sites(query)
         print "Length for sites : " + str(len(sites))
         site = sites[0]
@@ -259,7 +264,7 @@ def output_search():
             region=form.region.data,
             type=form.tower_type.data,
             date_of_inspection=form.date_of_inspection.data
-            )
+        )
 
         sites = list(DB.find_sites(query))
 
@@ -270,7 +275,7 @@ def output_search():
         return render_template('download.html')
     else:
         print "Form failed to validate"
-    return redirect(url_for('output'))
+        return render_template("output.html", searchform=SearchForm())
 
 
 @app.route("/output/download", methods=["POST"])
@@ -288,11 +293,10 @@ def return_files_tut():
     try:
         parentddir = os.path.abspath(os.path.dirname(__file__))
         filename = 'sites.xlsx'
-        full_path = os.path.join(parentddir,filename)
+        full_path = os.path.join(parentddir, filename)
         return send_file(full_path, attachment_filename=filename)
     except Exception as e:
         return str(e)
-
 
 
 def make_query(site_name=None, site_number=None, region=None, type=None, date_of_inspection=None):
@@ -316,6 +320,15 @@ def make_query(site_name=None, site_number=None, region=None, type=None, date_of
     # etc...
 
     return query
+
+
+@app.route('/vort', methods=['post', 'get'])
+def vort():
+    form = DateForm()
+    if form.validate_on_submit():
+        print form.dt.data
+        return form.dt.data.strftime('%Y-%m-%d')
+    return render_template('vort.html', form=form)
 
 
 if __name__ == '__main__':

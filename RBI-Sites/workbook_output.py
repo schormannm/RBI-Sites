@@ -59,19 +59,18 @@ output_columns_main = {"instanceID": 1,
                        "capacity_10_from_top": 31
                        }
 
-output_columns_loadings = {"instanceID": 1,
+output_columns_loadings_common = {"instanceID": 1,
                            "site_name": 2,
                            "site_number": 3,
                            "inspector_name": 4,
                            "region": 5,
-                           "loading_operator": 6,
-                           "nr_of_GSM_antenna": 7,
-                           "size_of_GSM_antenna": 8,
-                           "height_of_GSM_antenna": 9,
-                           "number_of_MW_dishes": 10,
-                           "date_of_structural_approval": 11,
-                           "structural_approval_for": 12
+                                  }
 
+output_columns_loadings = {"owner": 6,
+                           "type": 7,
+                           "size": 8,
+                           "height": 9,
+                           "active": 10,
                            }
 
 output_lookup = {"instanceID": "site.@instanceID",
@@ -105,13 +104,11 @@ output_lookup = {"instanceID": "site.@instanceID",
                  "mast_upgrade_date": "site.manual.mast_upgrade_date",
                  "capacity_top": "site.manual.capacity_top",
                  "capacity_10_from_top": "site.manual.capacity_10_from_top",
-                 "loading_operator": "site.loadings_group.sorted_loading_table.sorted_loading_table-repeat.@.owner",
-                 "nr_of_GSM_antenna": "site.loadings_group.summary_loading_table.&.panel",
-                 "size_of_GSM_antenna": "site.loadings_group.sorted_loading_table.sorted_loading_table-repeat.@.size",
-                 "height_of_GSM_antenna": "site.loadings_group.sorted_loading_table.sorted_loading_table-repeat.@.height",
-                 "number_of_MW_dishes": "site.loadings_group.summary_loading_table.&.panel",
-                 "date_of_structural_approval": "site.loading_group.summary_loading_table.&.date_of_structural_approval",
-                 "structural_approval_for": "site.loading_group.summary_loading_table.&.structural_approval_for"
+                 "owner": "site.loadings_group.sorted_loading_table.sorted_loading_table-repeat.@.owner",
+                 "type": "site.loadings_group.sorted_loading_table.sorted_loading_table-repeat.@.type",
+                 "size": "site.loadings_group.sorted_loading_table.sorted_loading_table-repeat.@.size",
+                 "height": "site.loadings_group.sorted_loading_table.sorted_loading_table-repeat.@.height",
+                 "active": "site.loadings_group.sorted_loading_table.sorted_loading_table-repeat.@.operationally_active",
                  }
 
 
@@ -120,7 +117,7 @@ def save_to_workbook(sites, output_file):
     workbook = Workbook()
 
     create_sites_worksheet(sites, workbook, "Sites", 0, output_columns_main)
-    create_loadings_worksheet(sites, workbook, "Loadings", 1, output_columns_loadings)
+    create_loadings_worksheet(sites, workbook, "Loadings", 1, output_columns_loadings_common, output_columns_loadings)
 
     # Save the file
     output_filename = output_file
@@ -129,11 +126,15 @@ def save_to_workbook(sites, output_file):
     return output_filename
 
 
-def create_heading_row(worksheet, output_columns):
+def create_heading_row(worksheet, output_columns, output_columns_extra=None):
     # Start from the first cell. Rows and columns are zero indexed.
     row = 1
     for tag, value in output_columns.iteritems():
         _ = worksheet.cell(row=row, column=value, value=tag)
+
+    if output_columns_extra is not None:
+        for tag, value in output_columns_extra.iteritems():
+            _ = worksheet.cell(row=row, column=value, value=tag)
 
 
 def create_data_rows(sites, worksheet, output_columns):
@@ -152,34 +153,46 @@ def create_data_rows(sites, worksheet, output_columns):
         col = 1
 
 
-def create_data_rows_loadings(sites, worksheet, output_columns):
+def create_data_rows_loadings(sites, worksheet, output_columns_common, output_columns_loadings):
     row = 2
     for site in sites:
         # Iterate over the data and write it out row by row.
         mongo_str = "site.loadings_group.sorted_loading_table.sorted_loading_table-repeat"
         args = mongo_str.split(".")
         loading_table = dict_digger.dig(site, *args)
-        print "Loading table"
-        print loading_table
-        return
-        for loading in loading_table:
 
-            for tag, value in output_columns.iteritems():
-                col = output_columns[tag]  # get the column from the dictionary
-                tag = tag_fixer(tag, row)
-                value = get_site_value(site, tag)
-                # print "Tag : " + tag + " Value: " + str(value)
-                _ = worksheet.cell(row=row, column=col, value=value)
-                col += 1
+        if loading_table:
+            print "Loading table"
+            # print loading_table
 
-            row += 1
-            col = 1
+            for loading in loading_table:
+                print "Loading"
+                # print loading
+                for tag, value in output_columns_common.iteritems():
+                    col = output_columns_common[tag]  # get the column from the dictionary
+                    tag = tag_fixer(tag, row)
+                    value = get_site_value(site, tag)
+                    print "Tag : " + tag + " Value: " + str(value)
+                    _ = worksheet.cell(row=row, column=col, value=value)
+                    col += 1
+
+                for tag, value in output_columns_loadings.iteritems():
+                    col = output_columns_loadings[tag]  # get the column from the dictionary
+                    tag = tag_fixer(tag, row)
+                    value = loading[tag]
+                    # print "Tag : " + tag + " Value: " + str(value)
+                    _ = worksheet.cell(row=row, column=col, value=value)
+                    col += 1
+
+                row += 1
+                col = 1
 
 
 def tag_fixer(tag, row):
     index = row
     new_tag = tag
     return new_tag
+
 
 def create_sites_worksheet(sites, workbook, sheet_title, sheet_nr, column_def):
     worksheet = workbook.create_sheet(title=sheet_title, index=sheet_nr)
@@ -188,11 +201,11 @@ def create_sites_worksheet(sites, workbook, sheet_title, sheet_nr, column_def):
     create_data_rows(sites, worksheet, column_def)
 
 
-def create_loadings_worksheet(sites, workbook, sheet_title, sheet_nr, column_def):
+def create_loadings_worksheet(sites, workbook, sheet_title, sheet_nr, column_def, column_def2):
     worksheet = workbook.create_sheet(title=sheet_title, index=sheet_nr)
 
-    create_heading_row(worksheet, column_def)
-    create_data_rows(sites, worksheet, column_def)
+    create_heading_row(worksheet, column_def, column_def2)
+    create_data_rows_loadings(sites, worksheet, column_def, column_def2)
 
 
 def get_site_value(site, tag):

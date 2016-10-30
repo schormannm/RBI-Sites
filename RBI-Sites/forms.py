@@ -1,8 +1,11 @@
 from flask_wtf import Form
+
 from wtforms import PasswordField
 from wtforms import SubmitField
 from wtforms.fields.html5 import EmailField
-from wtforms import TextField
+from wtforms.fields.html5 import DateField
+from wtforms import widgets
+
 from wtforms import StringField
 from wtforms import SelectField
 from wtforms import HiddenField
@@ -26,8 +29,8 @@ class LoginForm(Form):
 
 
 class SearchForm(Form):
-    site_name = StringField('site_name')
-    site_number = StringField('site_number')
+    site_name = StringField(label="Site Name")
+    site_number = StringField('Site Number')
     regionChoices = [('','Any Region'),('CENTRAL','CENTRAL'),('EASTERN','EASTERN'),('LIMPOPO','LIMPOPO'),
                      ('MPUMALANGA','MPUMALANGA'),('GAUTENG-North','GAUTENG-North'),('GAUTENG-South','GAUTENG-South'),
                      ('GAUTENG-Central','GAUTENG-Central'),('KZN-NORTH','KZN-NORTH'),('KZN-SOUTH','KZN-SOUTH'),
@@ -35,9 +38,7 @@ class SearchForm(Form):
     region = SelectField(u'Region', choices = regionChoices)
     typeChoices = [('','Any type'),('Lattice','Lattice'),('Monopole','Monopole'),('Mono-Lattice','Mono-lattice')]
     tower_type = SelectField(u'Tower Type', choices = typeChoices)
-    date_of_inspection = StringField(u'date_of_inspection')
-    date_of_inspection_before = StringField(u'date_of_inspection')
-    date_of_inspection_after = StringField(u'date_of_inspection')
+    date_of_inspection = StringField(u'Date of Inspection')
     submit = SubmitField('searchsubmit', validators=[validators.DataRequired()])
 
 
@@ -55,6 +56,10 @@ class UpdateForm(Form):
     capacity_10_from_top = StringField('capacity_10_from_top')
     siteid=HiddenField('siteid')
     submit = SubmitField('updatesubmit', validators=[validators.DataRequired()])
+
+
+class DateForm(Form):
+    dt = DateField('Pick one Date', format="%m/%d/%Y")
 
 #
 

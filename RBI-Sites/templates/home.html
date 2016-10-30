@@ -1,74 +1,85 @@
 {% extends "base.html" %}
 
 {% block bodytag %}
-  <body {% if onloadmessage %} onload="alert('{{onloadmessage}}');" {% endif %}>
+    <body {% if onloadmessage %} onload="alert('{{ onloadmessage }}');" {% endif %}>
 {% endblock %}
 
 
 {% block navbar %}
     <nav class="navbar navbar-inverse navbar-fixed-top">
-      <div class="container">
-        <div class="navbar-header">
-          <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar" aria-expanded="true" aria-controls="navbar">
-            <span class="sr-only">Toggle navigation</span>
-            <span class="icon-bar"></span>
-            <span class="icon-bar"></span>
-            <span class="icon-bar"></span>
-          </button>
-          <a class="navbar-brand" href="#">Home</a>
-          <a class="navbar-brand" href="/new-user">New User</a>
-        </div>
-        <div id="navbar" class="navbar-collapse collapse">
-          <form class="navbar-form navbar-right" action="/login" method="POST">
-            {% if loginform.errors %}
-              <ul class="errors">
-                {% for field_name, field_errors in loginform.errors|dictsort if field_errors %}
-                  {% for error in field_errors %}
-                    <li>{{ error }}</li>
-                  {% endfor %}
-                {% endfor %}
-              </ul>
-            {% endif %}
-            {{ loginform.csrf_token}}
-            <div class="form-group">
-              {{ loginform.loginemail(class="form-control", placeholder="Email Address")}}
+        <div class="container">
+            <div class="navbar-header">
+                <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar"
+                        aria-expanded="true" aria-controls="navbar">
+                    <span class="sr-only">Toggle navigation</span>
+                    <span class="icon-bar"></span>
+                    <span class="icon-bar"></span>
+                    <span class="icon-bar"></span>
+                </button>
+                <a class="navbar-brand" href="#">Home</a>
+                <a class="navbar-brand" href="/new-user">New User</a>
             </div>
-            <div class="form-group">
-              {{ loginform.loginpassword(class="form-control", placeholder="Password")}}
-            </div>
-            <div class="form-group">
-              {{ loginform.submit(value="Sign in", class="btn btn-success")}}
-            </div>
-          </form>
+            <div id="navbar" class="navbar-collapse collapse">
+                <form class="navbar-form navbar-right" action="/login" method="POST">
+                    {% if loginform.errors %}
+                        <ul class="errors">
+                            {% for field_name, field_errors in loginform.errors|dictsort if field_errors %}
+                                {% for error in field_errors %}
+                                    <li>{{ error }}</li>
+                                {% endfor %}
+                            {% endfor %}
+                        </ul>
+                    {% endif %}
+                    {{ loginform.csrf_token }}
+                    <div class="form-group">
+                        {{ loginform.loginemail(class="form-control", placeholder="Email Address") }}
+                    </div>
+                    <div class="form-group">
+                        {{ loginform.loginpassword(class="form-control", placeholder="Password") }}
+                    </div>
+                    <div class="form-group">
+                        {{ loginform.submit(value="Sign in", class="btn btn-success") }}
+                    </div>
+                </form>
 
-        </div><!--/.navbar-collapse -->
-      </div>
+            </div><!--/.navbar-collapse -->
+        </div>
     </nav>
 {% endblock %}
 
 {% block content %}
     <div class="jumbotron">
-      <div class="container">
-        <h1>RBI Site Data System</h1>
-        <p>A general tower inspection data viewing tool</p>
-      </div>
+        <div class="container">
+            <div class="row">
+                <div class="col-md-4">
+                    <img src="/static/images/l-logo.png">
+                </div>
+                <div class="col-md-8">
+                    <h1>RBI Tower Data System</h1>
+                    <p>A general tower inspection data viewing tool</p>
+                </div>
+            </div>
+        </div>
     </div>
 
+
+
     <div class="container">
-      <div class="row">
-        <div class="col-md-4">
-          <h2>Simple</h2>
-          <p>Just select the parameters you want to search on. Leave the ones you don't care about blank</p>
+        <div class="row">
+            <div class="col-md-4">
+                <h2>Simple</h2>
+                <p>Just select the parameters you want to search on. Leave the ones you don't care about blank</p>
+            </div>
+            <div class="col-md-4">
+                <h2>Secure</h2>
+                <p>Before you can do anything else, you need to login. Management and usage all directly from this
+                    page.</p>
+            </div>
+            <div class="col-md-4">
+                <h2>Safe</h2>
+                <p>If you have not received login details, you need to request these from your system administrator</p>
+            </div>
         </div>
-        <div class="col-md-4">
-          <h2>Secure</h2>
-          <p>Before you can do anything else, you need to login. Management and usage all directly from this page.</p>
-       </div>
-        <div class="col-md-4">
-          <h2>Safe</h2>
-          <p>If you have not received login details, you need to request these from your system administrator</p>
-       </div>
-      </div>
     </div>
 {% endblock %}
 

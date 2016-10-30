@@ -14,11 +14,9 @@
             <div class="col-md-12">
 
                 <div class="container">
-                    <div class="row">
-                        <div class="col-md-6">
-                            <h2>Find Site by parameters</h2>
-                            <form class="form-inline" action="/lookup/search" method="POST">
-                                <div class="form-group">
+                    <div class="col-md-5">
+                        <h2>Find Site A by parameters</h2>
+                        <form class="form-horizontal" action="/lookup/search" method="POST">
                                     {% if searchform.site_name.errors %}
                                         <ul class="errors">
                                             {% for error in searchform.site_name.errors %}
@@ -27,20 +25,30 @@
                                         </ul>
                                     {% endif %}
                                     {{ searchform.csrf_token }}
+                            <div class="form-group">
                                     {{ searchform.site_name(class="form-control", placeholder="Site name") }}
+                            </div>
+                            <div class="form-group">
                                     {{ searchform.site_number(class="form-control", placeholder="Site number") }}
+                            </div>
+                            <div class="form-group">
                                     {{ searchform.region(class="form-control", placeholder="Region") }}
+                            </div>
+                            <div class="form-group">
                                     {{ searchform.tower_type(class="form-control", placeholder="Tower type") }}
+                            </div>
+                            <div class="form-group">
                                     {{ searchform.date_of_inspection(class="form-control", placeholder="Inspection date") }}
+                            </div>
+                            <div class="form-group">
                                     {{ searchform.submit(value="Find", class="btn btn-primary") }}
                                 </div>
                             </form>
 
                         </div>
-                        <div class="col-md-6">
-                            <h2>Find Site by parameters</h2>
-                            <form class="form-inline" action="/lookup/search" method="POST">
-                                <div class="form-group">
+                    <div class="col-md-5">
+                        <h2>Find Site B by parameters</h2>
+                        <form class="form-horizontal" action="/lookup/search" method="POST">
                                     {% if searchform.site_name.errors %}
                                         <ul class="errors">
                                             {% for error in searchform.site_name.errors %}
@@ -49,11 +57,22 @@
                                         </ul>
                                     {% endif %}
                                     {{ searchform.csrf_token }}
+                            <div class="form-group">
                                     {{ searchform.site_name(class="form-control", placeholder="Site name") }}
+                            </div>
+                            <div class="form-group">
                                     {{ searchform.site_number(class="form-control", placeholder="Site number") }}
+                            </div>
+                            <div class="form-group">
                                     {{ searchform.region(class="form-control", placeholder="Region") }}
+                            </div>
+                            <div class="form-group">
                                     {{ searchform.tower_type(class="form-control", placeholder="Tower type") }}
+                            </div>
+                            <div class="form-group">
                                     {{ searchform.date_of_inspection(class="form-control", placeholder="Inspection date") }}
+                            </div>
+                            <div class="form-group">
                                     {{ searchform.submit(value="Find", class="btn btn-primary") }}
                                 </div>
                             </form>
