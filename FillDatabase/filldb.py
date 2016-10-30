@@ -32,7 +32,7 @@ namespace_string = "{http://opendatakit.org/submissions}"
 spacer = "\n============================================================++++=========================\n"
 thin_spacer = "-----------------------------------------------------------------------------------------\n"
 
-file_pattern_to_match = "*.mog"
+
 
 DB = DBHelper()
 
@@ -63,7 +63,7 @@ def parse_element(element):
 #
 # Valid questions - what about the .mog files from the transmogrifier step?
 # ...
-def get_files(dir):
+def get_files(dir, file_pattern_to_match):
     file_matches = []
     count = 0
 
@@ -104,7 +104,7 @@ def fix_header(input_file):
         finally:
             f1.close()
     except:
-        print "File cannot be opened"
+        print "File " + input_file + " cannot be opened"
         return False
 
     # print new_line
@@ -131,6 +131,7 @@ input_filename = args.input_filename
 dir = args.dir
 
 print "\nDatabase Filler starting up ...."
+records_at_start = DB.number_of_records()
 
 if not os.path.exists(dir):
     print "Horror - input directory " + dir , " does NOT exist! That's BAD!"
@@ -140,8 +141,9 @@ else:
 
     uuid_paths = []
     sites = []
+    file_pattern_to_match = "*.mog"
 
-    matches = get_files(dir)
+    matches = get_files(dir, file_pattern_to_match)
     total_file_count = len(matches)
 
     print "Found " , total_file_count, " .xml files to search"
@@ -149,11 +151,10 @@ else:
     file_count = 0
 
     for file_name in matches:               # matches is a list of directories that have xml files in them
-        # print thin_spacer
         file_count += 1
         dir, infilename = os.path.split( file_name)     # actually dealing with full paths here
 
-        if not "uuid" in dir:
+        if not "uuid" in dir:  # there are some directories that do have .xml files in but are not relevant
             pass
             # print "Skipping processing for non-UUID directory " + dir
         else:
@@ -164,17 +165,24 @@ else:
 
             if fix_header(file_name):
                 dict = xmltodict.parse(open(file_name, 'r').read())  # dict is a dictionary
-                inside = OrderedDict(dict.get('PSEIA'))  # needed to strip off outside layer of XML  - not needed
+                site_data = OrderedDict(dict.get('PSEIA'))  # needed to strip off outside layer of XML  - not needed
                 # print inside
-                if not DB.add_site(inside):
+                if not DB.add_site(site_data):
                     print "Record not added - probable duplicate"
 
             print "Completed processing of file # " + str(file_count) + " out of " + str(total_file_count)
 
 print spacer
 
+records_at_end = DB.number_of_records()
+delta_records = records_at_end - records_at_start
+
 end_time = datetime.datetime.now()
 
 delta_time = end_time - start_time
 
 print "Elapsed time : " + str(delta_time) + " seconds"
+
+print "Started with : " + str(records_at_start)
+print "Ended with : " + str(records_at_end)
+print "Number of records added : " + str(delta_records)
