@@ -278,23 +278,16 @@ def output_search():
         return render_template("output.html", searchform=SearchForm())
 
 
-@app.route("/output/download", methods=["POST"])
+@app.route('/download-file/')
 @login_required
 def output_download():
-    filename = "sites.xlsx"
-    parentddir = os.path.abspath(os.path.dirname(__file__))
-    send_from_directory(directory=parentddir, filename=filename)
-
-    return redirect(url_for('output'))
-
-
-@app.route('/download-file/')
-def return_files_tut():
     try:
+        filename = "sites.xlsx"
         parentddir = os.path.abspath(os.path.dirname(__file__))
-        filename = 'sites.xlsx'
         full_path = os.path.join(parentddir, filename)
-        return send_file(full_path, attachment_filename=filename)
+        out_filename = "sites_out.xlsx"
+        # send_from_directory(directory=parentddir, filename=filename)
+        return send_file(full_path, attachment_filename=out_filename, as_attachment=True)
     except Exception as e:
         return str(e)
 

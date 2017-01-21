@@ -64,13 +64,14 @@ output_columns_loadings_common = {"instanceID": 1,
                            "site_number": 3,
                            "inspector_name": 4,
                            "region": 5,
+                                  "date_of_inspection": 6,
                                   }
 
-output_columns_loadings = {"owner": 6,
-                           "type": 7,
-                           "size": 8,
-                           "height": 9,
-                           "active": 10,
+output_columns_loadings = {"owner": 7,
+                           "type": 8,
+                           "size": 9,
+                           "height": 10,
+                           "active": 11,
                            }
 
 output_lookup = {"instanceID": "site.@instanceID",
