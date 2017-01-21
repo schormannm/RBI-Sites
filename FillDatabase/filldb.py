@@ -90,13 +90,37 @@ def write_json_file(input_file):
 
 def fix_header(input_file):
     line = open(input_file,'r').read()
-    pos = line.find(' ',0,40)
-    new_line = "<PSEIA" + line[pos:]
-    pos = new_line.find('</PSEIA',len(new_line)-40)
-    new_line = new_line[0:pos] + '</PSEIA>'
+    pos = line.find(' ', 0, 40)  # find first space - we want to change what is before it
+    new_line = "<PSEIA" + line[pos:]  # Set first part of string to this value
+    pos = new_line.find('</PSEIA', len(new_line) - 40)  # find occurrence at end of file
+    new_line = new_line[0:pos] + '</PSEIA>'  # replace with this
+    # print new_line
+    return new_line
 
+
+def get_site_data(file_name):
+    fixed_xml = fix_header(file_name)  # required to be able to strip off the outer layer
+    dict = xmltodict.parse(fixed_xml)  # dict is a dictionary
+    site_data = OrderedDict(dict.get('PSEIA'))  # needed to strip off outside layer of XML  - not needed
+
+    updated_site_data = insert_meta_data(site_data, file_name)
+    return updated_site_data
+
+
+def insert_meta_data(site_data, file_name):
+    root_path = uuid_paths[matches.index(file_name)]
+    # print "Root path : " + root_path
+
+    site_data["meta"] = {}  # create the dictionary to contain the meta data
+    site_data["meta"]["insert_time"] = str(datetime.datetime.now())
+    site_data["meta"]["file_path"] = root_path
+    site_data["meta"]["file_name"] = file_name
+    return site_data
+
+
+def save_to_file(filename, new_line):  # really not much reason to write to file from here
     try:
-        f1 = open(input_file, 'w')
+        f1 = open(filename, 'w')
         try:
             f1.write(new_line)
         except:
@@ -104,11 +128,10 @@ def fix_header(input_file):
         finally:
             f1.close()
     except:
-        print "File " + input_file + " cannot be opened"
+        print "File " + filename + " cannot be opened"
         return False
-
-    # print new_line
     return True
+
 
 #=============================================================================================================
 #
@@ -155,34 +178,24 @@ else:
         dir, infilename = os.path.split( file_name)     # actually dealing with full paths here
 
         if not "uuid" in dir:  # there are some directories that do have .xml files in but are not relevant
-            pass
-            # print "Skipping processing for non-UUID directory " + dir
+            pass  # print "Skipping processing for non-UUID directory " + dir
         else:
             # print "Input " + file_name
-            root_path = uuid_paths[matches.index(file_name)]
-            # print "Root path : " + root_path
+            site_data = get_site_data(file_name)  # this is a dictionary containing a sites data
 
-
-            if fix_header(file_name):
-                dict = xmltodict.parse(open(file_name, 'r').read())  # dict is a dictionary
-                site_data = OrderedDict(dict.get('PSEIA'))  # needed to strip off outside layer of XML  - not needed
-                # print inside
-                if not DB.add_site(site_data):
-                    print "Record not added - probable duplicate"
-
-            print "Completed processing of file # " + str(file_count) + " out of " + str(total_file_count)
+            if DB.add_site(site_data):
+                print "Completed processing of file # " + str(file_count) + " out of " + str(total_file_count)
+            else:
+                print "Record not added - probable duplicate"
 
 print spacer
 
 records_at_end = DB.number_of_records()
 delta_records = records_at_end - records_at_start
-
 end_time = datetime.datetime.now()
-
 delta_time = end_time - start_time
 
 print "Elapsed time : " + str(delta_time) + " seconds"
-
 print "Started with : " + str(records_at_start)
 print "Ended with : " + str(records_at_end)
 print "Number of records added : " + str(delta_records)

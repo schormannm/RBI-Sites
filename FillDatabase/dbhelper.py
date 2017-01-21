@@ -15,16 +15,16 @@ class DBHelper:
 
     def add_site(self, site):
         site_id = site["@instanceID"]  # site data comes in as a dictionary, so we can search for records based on it
-        print site_id
+        # print site_id
         result = self.db.sites.find_one({"site.@instanceID": site_id})
         if result is not None:
-            print "Found a match  in db"
+            print "Found match in db - not adding -> " + site_id
             return True
         else:
             try:
                 self.db.sites.insert_one({"site": site})
                 # print "Matched: " + str(result.matched_count) + "   Modified: " + str(result.modified_count)
-                print "Site with ID: " + site_id + " added to database"
+                print "Site ID: " + site_id + " added to database"
                 return True
             except pymongo.errors.DuplicateKeyError:
                 print "Duplicate key error exception triggered"
