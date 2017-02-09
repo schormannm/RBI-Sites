@@ -103,7 +103,7 @@ def get_site_data(file_name):
     dict = xmltodict.parse(fixed_xml)  # dict is a dictionary
     site_data = OrderedDict(dict.get('PSEIA'))  # needed to strip off outside layer of XML  - not needed
 
-    updated_site_data = insert_meta_data(site_data, file_name)
+    updated_site_data = insert_meta_data(site_data, file_name)  # important to initialise the meta data here
     return updated_site_data
 
 
@@ -115,6 +115,12 @@ def insert_meta_data(site_data, file_name):
     site_data["meta"]["insert_time"] = str(datetime.datetime.now())
     site_data["meta"]["file_path"] = root_path
     site_data["meta"]["file_name"] = file_name
+    site_data["meta"]["processed"] = False
+    site_data["meta"]["edited"] = False
+    site_data["meta"]["last_edited"] = ""
+    site_data["meta"]["reprocessed"] = False
+    site_data["meta"]["image_storage_url"] = "s3://rbi-tech-storage/forms"
+
     return site_data
 
 
@@ -135,12 +141,14 @@ def save_to_file(filename, new_line):  # really not much reason to write to file
 
 #=============================================================================================================
 #
-# The catalogger traverses the directory tree of ODK Storage and catalogs what is in each of the UUID directories
-# and which specific instance of inspection is represented by the submission.xml in there.
+# The filldb program traverses the directory tree of ODK Storage and stores the content of each site within
+# the mog subdirecory of each of the UUID directories in the directory structure
+# into a MongoDB database
 #
 start_time = datetime.datetime.now()
 
-parser = argparse.ArgumentParser(description="takes an Aggregate XML file and produces a MOG file")
+parser = argparse.ArgumentParser(
+    description="takes an Aggregate XML file that has been mogrified and sticks it in the database")
 parser.add_argument("input_filename", help="the name of the input XML file without path")
 parser.add_argument("dir", help="the base path under which all the XML files reside in their "
                                 "respective sub-directories")
@@ -157,7 +165,7 @@ print "\nDatabase Filler starting up ...."
 records_at_start = DB.number_of_records()
 
 if not os.path.exists(dir):
-    print "Horror - input directory " + dir , " does NOT exist! That's BAD!"
+    print "Horror - input directory " + dir, " does NOT exist! That's BAD! Check your commandline parameters."
     exit()
 else:
     print "Great - input directory -> " + dir + " - EXISTS. All good."
@@ -169,7 +177,7 @@ else:
     matches = get_files(dir, file_pattern_to_match)
     total_file_count = len(matches)
 
-    print "Found " , total_file_count, " .xml files to search"
+    print "Found ", total_file_count, " ", file_pattern_to_match, " files to search"
 
     file_count = 0
 
@@ -177,7 +185,7 @@ else:
         file_count += 1
         dir, infilename = os.path.split( file_name)     # actually dealing with full paths here
 
-        if not "uuid" in dir:  # there are some directories that do have .xml files in but are not relevant
+        if not "uuid" in dir:  # there are some directories that do have .mog or xml files in but are not relevant
             pass  # print "Skipping processing for non-UUID directory " + dir
         else:
             # print "Input " + file_name
