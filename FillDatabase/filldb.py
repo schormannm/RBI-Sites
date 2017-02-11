@@ -108,18 +108,50 @@ def get_site_data(file_name):
 
 
 def insert_meta_data(site_data, file_name):
-    root_path = uuid_paths[matches.index(file_name)]
+    mog_path = uuid_paths[matches.index(file_name)]
+    root_path = mog_path[:-3]
+    raw_file_name = root_path + "submission.xml"
     # print "Root path : " + root_path
+    tag = "/forms/"
+    pos = root_path.find(tag)
+    image_URL = "http://rbi-tech-storage.s3.amazonaws.com/forms/" + root_path[pos + len(tag):]
 
     site_data["meta"] = {}  # create the dictionary to contain the meta data
     site_data["meta"]["insert_time"] = str(datetime.datetime.now())
     site_data["meta"]["file_path"] = root_path
-    site_data["meta"]["file_name"] = file_name
-    site_data["meta"]["processed"] = False
-    site_data["meta"]["edited"] = False
-    site_data["meta"]["last_edited"] = ""
-    site_data["meta"]["reprocessed"] = False
-    site_data["meta"]["image_storage_url"] = "s3://rbi-tech-storage/forms"
+    site_data["meta"]["file_name"] = raw_file_name
+    site_data["meta"]["mog_file_name"] = file_name
+    site_data["meta"]["processed"] = False // has
+    the
+    file
+    been
+    processed
+    at
+    all
+    site_data["meta"]["edited"] = False // has
+    the
+    file
+    been
+    edited?
+    site_data["meta"]["last_edited"] = "" // when
+    was
+    the
+    file
+    last
+    edited
+    site_data["meta"]["reprocessed"] = False // been
+    reprocessed
+    fater
+    edit?  Set
+    FALSE if edited
+    site_data["meta"]["injected"] = False // been
+    injected? Set
+    FALSE if edited
+    site_data["meta"]["reported"] = False // report
+    been
+    generated?  Set
+    False if edited
+    site_data["meta"]["image_base_url"] = image_URL
 
     return site_data
 
@@ -130,7 +162,7 @@ def save_to_file(filename, new_line):  # really not much reason to write to file
         try:
             f1.write(new_line)
         except:
-            pass
+            print "File " + filename + " cannot be written to"
         finally:
             f1.close()
     except:
