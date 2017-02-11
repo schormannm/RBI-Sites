@@ -124,7 +124,7 @@ def insert_meta_data(site_data, file_name):
     site_data["meta"]["processed"] = False  # has the file been processed at all
     site_data["meta"]["edited"] = False  # has the file been edited?
     site_data["meta"]["last_edited"] = ""  # when was the file last edited
-    site_data["meta"]["reprocessed"] = False  # been reprocessed fater edit?  Set FALSE if edited
+    site_data["meta"]["reprocessed"] = False  # been reprocessed after edit?  Set FALSE if edited
     site_data["meta"]["injected"] = False  # been injected? Set FALSE if edited
     site_data["meta"]["reported"] = False  # report been generated?  Set False if edited
     site_data["meta"]["image_base_url"] = image_URL
