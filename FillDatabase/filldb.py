@@ -117,7 +117,7 @@ def insert_meta_data(site_data, file_name):
     image_URL = "http://rbi-tech-storage.s3.amazonaws.com/forms/" + root_path[pos + len(tag):]
 
     site_data["meta"] = {}  # create the dictionary to contain the meta data
-    site_data["meta"]["insert_time"] = str(datetime.datetime.now())
+    site_data["meta"]["insert_time"] = datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S')
     site_data["meta"]["file_path"] = root_path
     site_data["meta"]["file_name"] = raw_file_name
     site_data["meta"]["mog_file_name"] = file_name
