@@ -1,0 +1,397 @@
+{% extends "base.html" %}
+
+{% block extra_head %}
+<script type="text/javascript" src="http://www.lexiconista.com/xonomy/xonomy/xonomy.js"></script>
+<link type="text/css" rel="stylesheet" href="../static/xonomy/xonomy.css"/>
+
+<script type="text/javascript">
+    function start() {
+        var docSpec = {
+            onchange: function () {
+                console.log("I been changed now!")
+            },
+            validate: function (obj) {
+                console.log("I be validatin' now!")
+            },
+            elements: {
+                "start": {isReadOnly: true, mustBeAfter: ["n0:meta"], oneliner: true},
+                "end": {isReadOnly: true, mustBeAfter: ["n0:meta"], oneliner: true},
+                "today": {isReadOnly: true, mustBeAfter: ["n0:meta"], oneliner: true},
+                "deviceid": {isInvisible: true, oneliner: true},
+                "subscriberid": {isInvisible: true, oneliner: true},
+                "imei": {isInvisible: true, oneliner: true},
+                "phonenumber": {isInvisible: true, oneliner: true},
+
+                "tower_type": {oneliner: true, asker: Xonomy.askString},
+                "inspector_name": {oneliner: true, asker: Xonomy.askString},
+                "date_of_inspection": {oneliner: true, asker: Xonomy.askString},
+                "pic_outside": {oneliner: true, asker: Xonomy.askString},
+                "first_time": {isInvisible: true, oneliner: true, asker: Xonomy.askString},
+
+                // Sections and groups
+                "photos_to_tower_sect": {
+                    collapsed: function (jsElement) {
+                        return true;
+                    }
+                },
+                "site_group": {
+                    backgroundColour: "#52f656", collapsed: function (jsElement) {
+                        return true;
+                    }
+                },
+                "General_terrain": {
+                    collapsed: function (jsElement) {
+                        return true;
+                    }
+                },
+                "tower_group": {
+                    collapsed: function (jsElement) {
+                        return true;
+                    }
+                },
+                "containers": {
+                    backgroundColour: "#f2f656", collapsed: function (jsElement) {
+                        return true;
+                    }
+                },
+                "container_repeat": {
+                    collapsed: function (jsElement) {
+                        return true;
+                    }
+                },
+                "Vodacom_container_group": {
+                    backgroundColour: "#f2f656", collapsed: function (jsElement) {
+                        return true;
+                    }
+                },
+                "shaft_spine_section": {
+                    collapsed: function (jsElement) {
+                        return true;
+                    }
+                },
+
+                "tower_base_section": {
+                    collapsed: function (jsElement) {
+                        return true;
+                    }
+                },
+                "cable_window_section_repeat": {
+                    collapsed: function (jsElement) {
+                        return true;
+                    }
+                },
+                "fall_arrest_section": {
+                    backgroundColour: "#f2a6a6", collapsed: function (jsElement) {
+                        return true;
+                    }
+                },
+                "fall_arrest_repeat": {
+                    collapsed: function (jsElement) {
+                        return true;
+                    }
+                },
+                "platform_repeat": {
+                    collapsed: function (jsElement) {
+                        return true;
+                    }
+                },
+                "cable_gantry_group": {
+                    collapsed: function (jsElement) {
+                        return true;
+                    }
+                },
+                "cable_window_group": {
+                    collapsed: function (jsElement) {
+                        return true;
+                    }
+                },
+                "platform_group": {
+                    collapsed: function (jsElement) {
+                        return true;
+                    }
+                },
+                "loadings_group": {
+                    backgroundColour: "#52a6f6", collapsed: function (jsElement) {
+                        return true;
+                    }
+                },
+                "loading_repeat": {
+                    collapsed: function (jsElement) {
+                        return true;
+                    }
+                },
+                "redundant_equipment_group": {
+                    collapsed: function (jsElement) {
+                        return true;
+                    }
+                },
+                "pole_mounts_group": {
+                    collapsed: function (jsElement) {
+                        return true;
+                    }
+                },
+                "tower_top": {
+                    backgroundColour: "#a2f6a6", collapsed: function (jsElement) {
+                        return true;
+                    }
+                },
+                "aircraft_warning_light_group": {
+                    collapsed: function (jsElement) {
+                        return true;
+                    }
+                },
+                "aircraft_warning_light_repeat": {
+                    collapsed: function (jsElement) {
+                        return true;
+                    }
+                },
+                "photos_of_site_section": {
+                    collapsed: function (jsElement) {
+                        return true;
+                    }
+                },
+                "photos_from_tower_section": {
+                    collapsed: function (jsElement) {
+                        return true;
+                    }
+                },
+                "Additional_photos_repeat": {
+                    collapsed: function (jsElement) {
+                        return true;
+                    }
+                },
+                "R_S": {
+                    backgroundColour: "#f264e6", collapsed: function (jsElement) {
+                        return true;
+                    }
+                },
+                "signature_group": {
+                    backgroundColour: "#a4a6ff", collapsed: function (jsElement) {
+                        return true;
+                    }
+                },
+                "mono_tower_top": {
+                    collapsed: function (jsElement) {
+                        return true;
+                    }
+                },
+                "n0:meta": {
+                    isReadOnly: true, collapsed: function (jsElement) {
+                        return true;
+                    }
+                },
+
+                // site group parameters
+                "site_name": {oneliner: true},
+                "site_number": {oneliner: true},
+                "region": {oneliner: true},
+                "tower_owner": {oneliner: true},
+                "infrastructure_contractor": {oneliner: true},
+                "manufacturer": {oneliner: true},
+                "manufacture_year": {oneliner: true},
+                "job_number": {oneliner: true},
+                "report_number": {oneliner: true},
+                "mpi_report_number": {oneliner: true},
+                "fall_arrest_report_number": {oneliner: true},
+                "sign_board": {oneliner: true},
+                "spine_height": {oneliner: true},
+                "width_of_column": {oneliner: true},
+                "breadth_of_column": {oneliner: true},
+                "height_of_column": {oneliner: true},
+                "grading": {oneliner: true},
+
+                // the loadings_group parameters
+                "loading_type": {oneliner: true},
+                "loading_type_custom": {oneliner: true},
+                "loading_make": {oneliner: true},
+                "loading_make_custom": {oneliner: true},
+                "loading_size": {oneliner: true},
+                "loading_photo": {mustBeAfter: ["loading_height"], oneliner: true},
+                "loading_height": {oneliner: true},
+                "loading_owner": {mustBeBefore: ["loading_type"], oneliner: true},
+                "loading_pole_mount": {oneliner: true},
+                "loading_azimuth": {oneliner: true},
+                "loading_leg_allocation": {oneliner: true},
+                "loading_electrical_tilt": {oneliner: true},
+                "Feeder_Cable_Tag_Outside": {mustBeAfter: ["loading_height"], oneliner: true},
+                "antenna_sticker_photo": {mustBeAfter: ["loading_height"], oneliner: true},
+                "number_of_feeders": {oneliner: true},
+                "operationally_active": {oneliner: true},
+
+                // platform parameters
+                "platforms_number": {oneliner: true},
+                "platform_repeat_count": {isInvisible: true, oneliner: true},
+
+                // the container parameters
+                "num_containers": {oneliner: true},
+                "container_repeat_count": {isInvisible: true, oneliner: true},
+                "container_owner": {oneliner: true},
+                "container_size": {oneliner: true},
+                "main_power_circuit_breaker_size": {oneliner: true},
+                "power_supply_circuit_breaker_size": {oneliner: true},
+                "container_type": {oneliner: true},
+                "container_photo_closeup": {isInvisible: true, oneliner: true},
+                "container_photo_front": {isInvisible: true, oneliner: true},
+                "container_photo_feeder_cable_labels": {isInvisible: true, oneliner: true},
+                "photo_circuit_breaker": {isInvisible: true, oneliner: true},
+
+                // tower top parameters
+                "tower_total_height": {oneliner: true},
+                "number_of_aircraft_warning_light_clusters": {oneliner: true},
+                "aircraft_warning_light_repeat_count": {isInvisible: true, oneliner: true},
+                "aircraft_warrning_light_number": {oneliner: true},
+                "aircraft_warrning_light_height": {oneliner: true},
+
+                // miscellaneous
+                "external_coating_colour": {oneliner: true},
+                "monopole_tower_design": {oneliner: true},
+                "contruction_type": {oneliner: true},
+                "legs_number": {oneliner: true},
+                "legs_spacing_base": {oneliner: true},
+                "cable_gantry_outside": {oneliner: true},
+                "fall_arrest_section_exists": {oneliner: true},
+                "redundant_equipment_present": {oneliner: true},
+                "shaft_stiffener_fitted": {oneliner: true},
+                "shaft_spine_exists": {oneliner: true},
+                "lattice_ladder_photo": {isInvisible: true, oneliner: true},
+                "lattice_flange_configuration_photo": {isInvisible: true, oneliner: true},
+                "date_of_next_inspection_recommended": {oneliner: true},
+                "my_drawing": {oneliner: true},
+                "my_signature": {oneliner: true},
+
+                // R_S section parameters
+                "s1-1": {collapsed: true},
+                "s1-2": {collapsed: true},
+                "s1-3": {collapsed: true},
+                "s2-1": {collapsed: true},
+                "s2-2": {collapsed: true},
+                "s2-3": {collapsed: true},
+                "s2-4": {collapsed: true},
+                "s2-5": {collapsed: true},
+                "s3-1": {collapsed: true},
+                "s3-2": {collapsed: true},
+                "s3-3": {collapsed: true},
+                "s3-4": {collapsed: true},
+                "s3-5": {collapsed: true},
+                "s3-6": {collapsed: true},
+                "s3-7": {collapsed: true},
+                "s3-8": {collapsed: true},
+                "s4-1": {collapsed: true},
+                "s4-2": {collapsed: true},
+                "s4-3": {collapsed: true},
+                "s4-4": {collapsed: true},
+                "s4-5": {collapsed: true},
+                "s4-6": {collapsed: true},
+                "s4-7": {collapsed: true},
+                "s4-8": {collapsed: true},
+                "s4-9": {collapsed: true},
+                "s4-10": {collapsed: true},
+                "s4-11": {collapsed: true},
+
+                "h1-1": {collapsed: true},
+                "h1-2": {collapsed: true},
+                "h2-1": {collapsed: true},
+                "h2-2": {collapsed: true},
+                "h2-3": {collapsed: true},
+                "h2-4": {collapsed: true},
+                "h2-5": {collapsed: true},
+                "h2-6": {collapsed: true},
+                "h3-1": {collapsed: true},
+                "h3-2": {collapsed: true},
+                "h3-3": {collapsed: true},
+                "h3-4": {collapsed: true},
+                "h3-5": {collapsed: true},
+                "h3-6": {collapsed: true},
+                "h3-7": {collapsed: true},
+                "h3-8": {collapsed: true},
+                "h3-9": {collapsed: true},
+                "h3-10": {collapsed: true},
+                "h3-11": {collapsed: true},
+                "h3-12": {collapsed: true},
+                "h3-13": {collapsed: true},
+                "h3-14": {collapsed: true},
+                "h3-15": {collapsed: true},
+                "h3-16": {collapsed: true},
+                "h3-17": {collapsed: true},
+                "h4-1": {collapsed: true},
+
+                "m1-1": {collapsed: true},
+                "m1-2": {collapsed: true},
+                "m1-3": {collapsed: true},
+                "m1-4": {collapsed: true},
+                "m1-5": {collapsed: true},
+                "m2-1": {collapsed: true},
+                "m3-1": {collapsed: true},
+                "m3-2": {collapsed: true},
+                "m3-3": {collapsed: true},
+                "m3-4": {collapsed: true},
+                "m4-1": {collapsed: true},
+                "m4-2": {collapsed: true},
+                "m5-1": {collapsed: true},
+                "m5-2": {collapsed: true},
+                "m6-1": {collapsed: true},
+                "m7-1": {collapsed: true},
+
+                "l1-1": {collapsed: true},
+                "l1-2": {collapsed: true},
+                "l1-3": {collapsed: true},
+                "l2-1": {collapsed: true},
+                "l2-2": {collapsed: true},
+
+            }
+        };
+
+        {% autoescape off %}
+        var xml = "{{ file_content }}";
+        {% endautoescape %}
+        var editor = document.getElementById("editor");
+        Xonomy.setMode("laic");
+        Xonomy.render(xml, editor, docSpec);
+    }
+
+    $SCRIPT_ROOT = {{ request.script_root|tojson|safe }};
+
+    function submit() {
+        var xml = Xonomy.harvest();
+        var the_file = '{{ file }}';
+        var the_site = '{{ siteid }}';
+        // document.body.appendChild(document.createTextNode(xml));        // just so that we can see what has happened...
+        // the line above must be replaced with something that sends the edited XML back to the saver
+        $.post("/edit/save", {"updatedXML": xml, "raw_file": the_file, "siteid": the_site})
+    }
+
+</script>
+
+
+{% endblock %}
+
+{% block bodytag %}
+
+    <body onload="start()">
+{% endblock %}
+
+{% block content %}
+    <div class="jumbotron">
+        <div class="container">
+            <h1>Edit site</h1>
+            <p>Edit fields for a single site</p>
+        </div>
+    </div>
+
+    <div class="container">
+        <div class="row">
+            <div class="col-md-12">
+                <h2>XML editor for site chosen</h2>
+
+                <div id="editor"></div>
+                <button class="btn btn-primary btn-lg" onclick="submit()">Save Changes!</button>
+
+                <p></p>
+
+            </div>
+        </div>
+    </div>
+
+{% endblock %}
+
+

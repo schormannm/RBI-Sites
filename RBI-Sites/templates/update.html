@@ -4,8 +4,8 @@
 {% block content %}
     <div class="jumbotron">
       <div class="container">
-        <h1>Site Lookup</h1>
-        <p>Find sites from the database</p>
+        <h1>Site Update</h1>
+        <p>Post-inspection update of sites</p>
       </div>
     </div>
 
@@ -13,7 +13,8 @@
       <div class="row">
         <div class="col-md-12">
           <h2>Find Site by parameters</h2>
-          <form class="form-inline" action="/lookup/search" method="POST">
+            <h4>Enter values into any of the input boxes below to search on those values</h4>
+          <form class="form-inline" action="/update/search" method="POST">
             <div class="form-group">
               {% if searchform.site_name.errors %}
                 <ul class="errors">
@@ -32,18 +33,18 @@
             </div>
           </form>
 
-          <h2>Sites</h2>
+          <h2>Sites found</h2>
             <table class="table table-striped">
               <tr>
                 <th>Site Name</th>
                 <th>Site Number</th>
                 <th>Region</th>
                 <th>Type</th>
-                  <th>Inspection Date</th>
-                <th>Show</th>
+                <th>Inspection Date</th>
+                <th>Action</th>
               </tr>
               {% for site in sites %}
-                <form class="form-inline" action="/lookup/showsite">
+                <form class="form-inline" action="/update/showsite">
                   <tr>
                     <td>{{site.site.site_group.site_name}}</td>
                     <td>{{site.site.site_group.site_number}}</td>

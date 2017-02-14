@@ -82,7 +82,7 @@ def login():
         if stored_user and PH.validate_password(form.loginpassword.data, stored_user['salt'], stored_user['hashed']):
             user = User(form.loginemail.data)
             login_user(user, remember=True)
-            return redirect(url_for('lookup'))
+            return redirect(url_for('dashboard'))
         form.loginemail.errors.append("Email or password invalid")
     return render_template("home.html", loginform=form, registrationform=RegistrationForm())
 
@@ -116,14 +116,22 @@ def logout():
 def dashboard():
     nownow = datetime.datetime.now().strftime('%Y-%m-%d')
     lattice_cnt = DB.get_site_count({"site.tower_type": "Lattice"})
+    lattice_cnt += DB.get_site_count({"site.tower_type": "lattice"})
     monopole_cnt = DB.get_site_count({"site.tower_type": "Monopole"})
+    monopole_cnt += DB.get_site_count({"site.tower_type": "monopole"})
     monolattice_cnt = DB.get_site_count({"site.tower_type": "Mono-Lattice"})
+    monolattice_cnt += DB.get_site_count({"site.tower_type": "mono lattice"})
+    rooftop_cnt = DB.get_site_count({"site.tower_type": "Roof top"})
+    rooftop_cnt += DB.get_site_count({"site.tower_type": "rooftop"})
     total_cnt = DB.get_site_count({})
+    other_cnt = total_cnt - rooftop_cnt - monolattice_cnt - lattice_cnt - monopole_cnt
     context = {
         'features': [
             {'description': 'Lattice', 'value': lattice_cnt},
             {'description': 'Monopole', 'value': monopole_cnt},
             {'description': 'Mono-Lattice', 'value': monolattice_cnt},
+            {'description': 'Rooftop', 'value': rooftop_cnt},
+            {'description': 'Other or none', 'value': other_cnt},
             {'description': 'Total', 'value': total_cnt},
         ], 'date_now': nownow
     }
@@ -138,15 +146,21 @@ def dashboard_resolve():
     return redirect(url_for('dashboard'))
 
 
-@app.route("/lookup")
+@app.route("/update")
 @login_required
-def lookup():
-    return render_template("lookup.html", searchform=SearchForm())
+def update():
+    return render_template("update.html", searchform=SearchForm())
 
 
-@app.route("/lookup/search", methods=["POST"])
+@app.route("/edit")
 @login_required
-def lookup_search():
+def edit():
+    return render_template("edit.html", searchform=SearchForm())
+
+
+@app.route("/edit/search", methods=["POST"])
+@login_required
+def edit_search():
     form = SearchForm(request.form)
     print form.data
     if form.validate():
@@ -157,20 +171,72 @@ def lookup_search():
                            date_of_inspection=form.date_of_inspection.data
                            )
         sites = DB.find_sites(query)
-        print "Length for sites : " + str(len(sites))
-        site = sites[0]
-        print site
-        return render_template("lookup.html", searchform=form, sites=sites)
-    return redirect(url_for('lookup'))
+        return render_template("edit.html", searchform=form, sites=sites)
+    return redirect(url_for('edit'))
 
 
-@app.route("/lookup/showsite", methods=["POST", "GET"])
+@app.route("/edit/showsite", methods=["POST", "GET"])
 @login_required
-def lookup_showsite():
+def edit_showsite():
+    siteid = request.args.get("siteid")
+    sites = list(DB.get_site_byID(siteid))
+    assert (len(sites) == 1), "More than 1 site with same site ID"
+    site = sites[0]
+    print site
+    raw_file = site["site"]["meta"]["file_name"]
+    with open(raw_file, 'r') as content_file:
+        content = content_file.read()
+    print content
+    content = content.replace('\n', '')
+    content = content.replace('\r', '')
+    content = content.replace('"', "'")
+    return render_template("edit-site.html", file_content=content, file=raw_file,  siteid=siteid)
+
+
+@app.route("/edit/save", methods=['GET', 'POST'])
+@login_required
+def edit_save():
+    siteid = request.form["siteid"]
+    updated_xml = request.form['updatedXML']
+    xml = updated_xml.replace("xml:space='preserve'", "")
+    raw_file = request.form['raw_file']
+    print "Data received : " + xml
+    print "Output file : " + raw_file
+    print "Site id : " + siteid
+    with open(raw_file, 'w') as content_file:
+        content_file.write(xml)
+    sites = list(DB.get_site_byID(siteid))
+    assert (len(sites) == 1), "More than 1 site with same site ID"
+    site = sites[0]
+    print site
+    DB.update_site_edited(siteid, True)
+    return redirect(url_for('edit'))
+
+
+@app.route("/update/search", methods=["POST"])
+@login_required
+def update_search():
+    form = SearchForm(request.form)
+    print form.data
+    if form.validate():
+        query = make_query(site_name=form.site_name.data,
+                           site_number=form.site_number.data,
+                           region=form.region.data,
+                           type=form.tower_type.data,
+                           date_of_inspection=form.date_of_inspection.data
+                           )
+        sites = DB.find_sites(query)
+        return render_template("update.html", searchform=form, sites=sites)
+    return redirect(url_for('update'))
+
+
+@app.route("/update/showsite", methods=["POST", "GET"])
+@login_required
+def update_showsite():
     siteid = request.args.get("siteid")
     form = UpdateForm()
 
-    if DB.check_manual_exists(siteid):
+    if DB.check_manual_exists(siteid):  # has previously been updated
         print "Inside /lookup/showsite - and DB.manual_exists is True"
         sites = list(DB.show_site(siteid))
         mysite = sites[0]
@@ -184,7 +250,7 @@ def lookup_showsite():
         form.mast_upgraded_date.data = manual['mast_upgraded_date']
         form.capacity_top.data = manual['capacity_top']
         form.capacity_10_from_top.data = manual['capacity_10_from_top']
-    else:
+    else:                               # not previously updated - add the fields
         print "Inside /lookup/showsite - and DB.manual_exists is False"
         context = {
             'site.manual.updated': 'False',
@@ -200,16 +266,16 @@ def lookup_showsite():
             'site.manual.update_date': ""
         }
         DB.update_site_manual(siteid, context)
-    sites = list(DB.show_site(siteid))
-    print "Length for sites : " + str(len(sites))
+    sites = list(DB.get_site_byID(siteid))
+    assert (len(sites) == 1), "More than 1 site with same site ID"
     site = sites[0]
     print site
-    return render_template("showsite.html", updateform=form, site=site)
+    return render_template("update-site.html", updateform=form, site=site)
 
 
-@app.route("/lookup/update", methods=["POST", "GET"])
+@app.route("/update/save", methods=['GET','POST'])
 @login_required
-def lookup_updatesite():
+def update_save():
     # siteid = request.args.get("siteid")
     form = UpdateForm(request.form)
     siteid = form.siteid.data
@@ -237,8 +303,8 @@ def lookup_updatesite():
         site = sites[0]
         print "Show site after fetch"
         print site
-        # return render_template("showsite.html", updateform=form, site=site)
-    return redirect(url_for('lookup'))
+        # return render_template("update-site.html", updateform=form, site=site)
+    return redirect(url_for('update'))
 
 
 @app.route("/compare")

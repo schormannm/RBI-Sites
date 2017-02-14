@@ -4,7 +4,7 @@
 {% block content %}
     <div class="jumbotron">
       <div class="container">
-        <h1>Show site</h1>
+        <h1>Update site</h1>
         <p>Update manual fields for a single site</p>
       </div>
     </div>
@@ -40,7 +40,7 @@
 
           <h2>Manually update fields below</h2>
 
-            <form class="form-inline" action="/lookup/update" method="POST">
+            <form class="form-inline" action="/update/save" method="POST">
             <div class="form-group">
               {% if updateform.site_classification.errors %}
                 <ul class="errors">
