@@ -13,6 +13,7 @@ from flask import Flask
 from flask import render_template
 from flask import make_response
 from flask import request
+from flask import jsonify
 from flask.ext.login import LoginManager
 from flask.ext.login import login_required
 from flask.ext.login import login_user
@@ -356,6 +357,29 @@ def output_download():
         return send_file(full_path, attachment_filename=out_filename, as_attachment=True)
     except Exception as e:
         return str(e)
+
+
+@app.route('/VC-download/')
+def VC_download():
+    return "Happy days"
+
+
+@app.route('/VC-download/login')
+def VC_download_login():
+    return "Fat chance of that working"
+
+
+@app.route('/VC-download/list')
+def VC_download_list():
+    return "List available sites"
+
+
+@app.route('/VC-download/fetch/<string:uuid>')
+def VC_download_fetch(uuid):
+    numlist = [1, 2, 3, 4]
+    num_dict  = {'numbers': numlist, 'UUID' : uuid}
+    # return uuid
+    return jsonify({'Output': num_dict})
 
 
 def make_query(site_name=None, site_number=None, region=None, type=None, date_of_inspection=None):
