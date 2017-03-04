@@ -24,6 +24,7 @@ from flask import send_file
 from flask import redirect
 from flask import url_for
 from flask import send_from_directory
+from flask import Response
 
 from passwordhelper import PasswordHelper
 from user import User
@@ -369,18 +370,51 @@ def VC_download_login():
     return "Fat chance of that working"
 
 
-@app.route('/VC-download/list')
+@app.route('/VC-download/list', methods=["POST", "GET"])
 def VC_download_list():
-    return "List available sites"
+    site_name  = request.args.get("site_name")
+    site_number = ''
+    region = ''
+    tower_type = ''
+    date_of_inspection = ''
+    print site_name
+    query = make_query(site_name=site_name,
+                       site_number=site_number,
+                       region=region,
+                       type=tower_type,
+                       date_of_inspection=date_of_inspection
+                       )
+    projection = make_projection()
+    sites = DB.find_sites(query, projection)
+    sites_list = []
+    for site in sites:
+        sites_list.append(site["site"])
+    return jsonify({'site_list': sites_list})
 
 
 @app.route('/VC-download/fetch/<string:uuid>')
 def VC_download_fetch(uuid):
-    numlist = [1, 2, 3, 4]
-    num_dict  = {'numbers': numlist, 'UUID' : uuid}
-    # return uuid
-    return jsonify({'Output': num_dict})
+    site = DB.get_site_byUUID(uuid)
+    site_body = site["site"]
+    return jsonify({'Site': site_body})
 
+
+def make_projection(site_name=True, site_number=True, region=True, type=True, date_of_inspection=True, uuid=True):
+    projection = {}
+    if site_name:
+        projection['site.site_group.site_name'] = '1'
+    if site_number:
+        projection['site.site_group.site_number'] = '1'
+    if region:
+        projection['site.site_group.region'] = '1'
+    if type:
+        projection['site.tower_type'] = '1'
+    if date_of_inspection:
+        projection['site.date_of_inspection'] = '1'
+    if uuid:
+        projection['site.@instanceID'] = '1'
+
+    return projection
 
 def make_query(site_name=None, site_number=None, region=None, type=None, date_of_inspection=None):
     # all queries begin with something common, which may be an empty dict, but here's an example
