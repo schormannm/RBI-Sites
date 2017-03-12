@@ -1,5 +1,6 @@
 import pymongo
 from bson import ObjectId
+import datetime
 
 DATABASE = "rbi"
 
@@ -13,22 +14,35 @@ class DBHelper:
     def number_of_records(self):
         return self.db.sites.count()
 
-    def add_site(self, site):
-        site_id = site["@instanceID"]  # site data comes in as a dictionary, so we can search for records based on it
-        # print site_id
+    def check_existing_site(self, site, site_id):
+        print "Checking existence of " + site_id + " in database"
         result = self.db.sites.find_one({"site.@instanceID": site_id})
         if result is not None:
-            print "Found match in db - not adding -> " + site_id
             return True
         else:
-            try:
-                self.db.sites.insert_one({"site": site})
-                # print "Matched: " + str(result.matched_count) + "   Modified: " + str(result.modified_count)
-                print "Site ID: " + site_id + " added to database"
-                return True
-            except pymongo.errors.DuplicateKeyError:
-                print "Duplicate key error exception triggered"
-                return False
+            return False
+
+    def update_site_paths(self, site_id, full_filename):
+        file_path = ""
+        file_name = ""
+        mog_file_name = full_filename
+        meta_update = {
+            "site.meta.file_path": file_path,
+            "site.meta.file_name": file_name,
+            "site.meta.mog_file_name": mog_file_name
+        }
+        _id = self.get_site_byUUID(site_id)
+        self.db.sites.update({"_id": ObjectId(_id)}, {"$set": meta_update})
+
+    def add_site(self, site, site_id):
+        try:
+            self.db.sites.insert_one({"site": site})
+            # print "Matched: " + str(result.matched_count) + "   Modified: " + str(result.modified_count)
+            print "Site ID: " + site_id + " added to database"
+            return True
+        except pymongo.errors.DuplicateKeyError:
+            print "Duplicate key error exception triggered - probable duplicate"
+        return False
 
     def get_user(self, email):
         return self.db.users.find_one({"email": email})
@@ -36,33 +50,14 @@ class DBHelper:
     def add_user(self, email, salt, hashed):
         self.db.users.insert({"email": email, "salt": salt, "hashed": hashed})
 
-    def add_table(self, number, owner):
-        new_id = self.db.tables.insert({"number": number, "owner": owner})
-        return new_id
+    def get_site_byUUID(self, site_id):
+        return self.db.sites.find_one({"site.@instanceID": site_id})
 
-    def update_table(self, _id, url):
-        self.db.tables.update({"_id": _id}, {"$set": {"url": url}})
+    def get_site_byID(self, _id):
+        query = {"_id": ObjectId(_id)}
+        return self.db.sites.find(query)
 
-    def get_tables(self, owner_id):
-        return list(self.db.tables.find({"owner": owner_id}))
-
-    def get_table(self, table_id):
-        return self.db.tables.find_one({"_id": ObjectId(table_id)})
-
-    def delete_table(self, table_id):
-        self.db.tables.remove({"_id": ObjectId(table_id)})
-
-    def add_request(self, table_id, time):
-        table = self.get_table(table_id)
-        try:
-            self.db.requests.insert({"owner": table['owner'], "table_number": table[
-                                    'number'], "table_id": table_id, "time": time})
-            return True
-        except pymongo.errors.DuplicateKeyError:
-            return False
-
-    def get_requests(self, owner_id):
-        return list(self.db.requests.find({"owner": owner_id}))
-
-    def delete_request(self, request_id):
-        self.db.requests.remove({"_id": ObjectId(request_id)})
+    def get_meta_file_path(self, site_id):
+        site = self.db.sites.find_one({"site.@instanceID": site_id})
+        path = site["meta"]["file_path"]
+        return path

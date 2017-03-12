@@ -177,7 +177,7 @@ def edit_search():
     return redirect(url_for('edit'))
 
 
-def fix_xonomy(content):
+def fix_xonomy_formatting(content):
     print content
     content = content.replace('\n', '')
     content = content.replace('\r', '')
@@ -198,7 +198,7 @@ def edit_showsite():
         return redirect(url_for('edit'))        # could use an alternate URL for better feedback
     with open(raw_file, 'r') as content_file:
         content = content_file.read()
-    content = fix_xonomy(content)
+    content = fix_xonomy_formatting(content)
     return render_template("edit-site.html", file_content=content, file=raw_file,  siteid=siteid)
 
 

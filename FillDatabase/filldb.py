@@ -21,18 +21,13 @@ import xmltodict, json
 
 from dbhelper import DBHelper
 
-# dir ="/home/mark/Briefcase/Storage/ODK Briefcase Storage/forms/PSEIA_Lattice 2015-1.13/instances"
+# Examples of directories where files might be.
 # dir ="/home/mark/Briefcase/Storage/ODK Briefcase Storage/forms"
-# dir ="C:\\RBI-Data\\Briefcase\\ODK Briefcase Storage\\forms\\PSEIA_Lattice 2015-1.13\\instances"
-# dir ="C:\\RBI-Data\\Briefcase\\ODK Briefcase Storage\\forms\\PSEIA_Monopole_2015-1.15\\instances"
 # dir ="C:\\RBI-Data\\Briefcase\\ODK Briefcase Storage\\forms"
 
-namespace_string = "{http://opendatakit.org/submissions}"
-
 spacer = "\n============================================================++++=========================\n"
-thin_spacer = "-----------------------------------------------------------------------------------------\n"
 
-
+S3_URL = "http://rbi-tech-storage.s3.amazonaws.com/forms/"
 
 DB = DBHelper()
 
@@ -112,15 +107,19 @@ def insert_meta_data(site_data, file_name):
     root_path = mog_path[:-3]
     raw_file_name = root_path + "submission.xml"
     # print "Root path : " + root_path
+    archived_status = False
+    if "Archive" in root_path:
+        archived_status = True
     tag = "/forms/"
     pos = root_path.find(tag)
-    image_URL = "http://rbi-tech-storage.s3.amazonaws.com/forms/" + root_path[pos + len(tag):]
+    image_URL = S3_URL + root_path[pos + len(tag):]
 
     site_data["meta"] = {}  # create the dictionary to contain the meta data
     site_data["meta"]["insert_time"] = datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S')
     site_data["meta"]["file_path"] = root_path
     site_data["meta"]["file_name"] = raw_file_name
     site_data["meta"]["mog_file_name"] = file_name
+    site_data["meta"]["file_archived"] = archived_status
     site_data["meta"]["processed"] = False      # has the file been processed at all
     site_data["meta"]["edited"] = False         # has the file been edited?
     site_data["meta"]["last_edited"] = ""       # when was the file last edited
@@ -188,21 +187,29 @@ else:
     print "Found ", total_file_count, " ", file_pattern_to_match, " files to search"
 
     file_count = 0
+    found_count = 0
+    new_count = 0
 
     for file_name in matches:               # matches is a list of directories that have xml files in them
         file_count += 1
         dir, infilename = os.path.split( file_name)     # actually dealing with full paths here
 
-        if not "uuid" in dir:  # there are some directories that do have .mog or xml files in but are not relevant
-            pass  # print "Skipping processing for non-UUID directory " + dir
-        else:
+        if "uuid" in dir:  # there are some directories that do have .mog or xml files in but are not relevant
             # print "Input " + file_name
             site_data = get_site_data(file_name)  # this is a dictionary containing a sites data
+            site_id = site_data["@instanceID"]  # site data comes in as a dictionary, so we can search for records based on it
 
-            if DB.add_site(site_data):
-                print "Completed processing of file # " + str(file_count) + " out of " + str(total_file_count)
+            if DB.check_existing_site(site_data, site_id):  # returns True if site already exists
+                print "Found match in db - not adding -> but need to check"  # site exists in database, check integrity
+                file_path_db = DB.get_meta_file_path(site_id)
+                print "DB file path : " + file_path_db
+                print "Current file path : " + file_name
+                found_count += 1
             else:
-                print "Record not added - probable duplicate"
+                print "Would have added the site"
+                new_count += 1
+                # if DB.add_site(site_data, site_id):
+                #     print "Completed processing of file # " + str(file_count) + " out of " + str(total_file_count)
 
 print spacer
 
@@ -212,6 +219,10 @@ end_time = datetime.datetime.now()
 delta_time = end_time - start_time
 
 print "Elapsed time : " + str(delta_time) + " seconds"
+print "From database"
 print "Started with : " + str(records_at_start)
 print "Ended with : " + str(records_at_end)
 print "Number of records added : " + str(delta_records)
+print "From program"
+print "Number of records found as existing : " + str(found_count)
+print "Number of records not found : " + str(new_count)
