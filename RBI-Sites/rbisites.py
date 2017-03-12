@@ -177,6 +177,14 @@ def edit_search():
     return redirect(url_for('edit'))
 
 
+def fix_xonomy(content):
+    print content
+    content = content.replace('\n', '')
+    content = content.replace('\r', '')
+    content = content.replace('"', "'")
+    return content
+
+
 @app.route("/edit/showsite", methods=["POST", "GET"])
 @login_required
 def edit_showsite():
@@ -186,12 +194,11 @@ def edit_showsite():
     site = sites[0]
     print site
     raw_file = site["site"]["meta"]["file_name"]
+    if not os.path.exists(raw_file):
+        return redirect(url_for('edit'))        # could use an alternate URL for better feedback
     with open(raw_file, 'r') as content_file:
         content = content_file.read()
-    print content
-    content = content.replace('\n', '')
-    content = content.replace('\r', '')
-    content = content.replace('"', "'")
+    content = fix_xonomy(content)
     return render_template("edit-site.html", file_content=content, file=raw_file,  siteid=siteid)
 
 

@@ -33,8 +33,17 @@ class DBHelper:
 
     def update_site_edited(self, _id, edit_flag):
         nownow = datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S')
-        self.db.sites.update({"_id": ObjectId(_id)}, {"$set": {"site.meta.edited": edit_flag}})
-        self.db.sites.update({"_id": ObjectId(_id)}, {"$set": {"site.meta.last_edited": nownow}})
+        meta_update = {
+            "site.meta.edited": edit_flag,
+            "site.meta.last_edited": nownow,
+            "site.meta.reprocessed": "False",
+            "site.meta.injected": "False",
+            "site.meta.reported": "False"
+        }
+        self.db.sites.update({"_id": ObjectId(_id)}, {"$set": meta_update})
+
+    #   self.db.sites.update({"_id": ObjectId(_id)}, {"$set": {"site.meta.edited": edit_flag}})
+
 
     # This function updates the manual fields in the database.  These are post inspection fields
     # The format of the update collection is as shown below
@@ -53,6 +62,7 @@ class DBHelper:
     #     'site.manual.capacity_10_from_top': "",
     #     'site.manual.update_date': ""
     # }
+    #
     def update_site_manual(self, _id, manual):
         print manual
         self.db.sites.update({"_id": ObjectId(_id)}, {"$set": manual})
@@ -80,9 +90,10 @@ class DBHelper:
         query = {"_id": ObjectId(_id)}
         return self.db.sites.find(query)
 
-    def find_sites(self, query):
+    def find_sites(self, query, projection={"site.imei": 0}):
         print "Query : " + str(query)
-        return list(self.db.sites.find(query))
+        print "Projection : " + str(projection)
+        return list(self.db.sites.find(query, projection))
 
     def get_site_count(self,query):
         return self.db.sites.find(query).count()
